@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,12 +13,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.experimental.FieldDefaults;
+import net.dunice.newsapi.validations.ValidEmail;
 import net.dunice.newsapi.validations.ValidPassword;
 import net.dunice.newsapi.validations.ValidUsername;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -38,18 +39,20 @@ public class UserEntity implements UserDetails {
     @ValidUsername
     String username;
 
+    @Column(unique = true)
+    @ValidEmail
+    String email;
+
     @ValidPassword
     String password;
 
     String avatar;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_name")
     RoleEntity role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return List.of(new SimpleGrantedAuthority(role.getName()));
     }
 }
-

@@ -24,6 +24,8 @@ repositories {
 }
 
 dependencies {
+	val mapstructVersion = "1.6.2"
+
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
@@ -36,6 +38,8 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.mapstruct:mapstruct:$mapstructVersion")
+	annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
 }
 
 tasks.withType<Test> {
