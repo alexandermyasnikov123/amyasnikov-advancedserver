@@ -1,4 +1,4 @@
-package net.dunice.newsapi.dto.response.common;
+package net.dunice.newsapi.dtos.responses.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nullable;

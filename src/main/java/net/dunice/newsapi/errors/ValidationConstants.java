@@ -19,7 +19,7 @@ public interface ValidationConstants {
 
     String EXCEPTION_HANDLER_NOT_PROVIDED = "Exception handler not provided";
 
-    String REQUEST_IS_NOT_MULTIPART = "Current request is not a multipart request";
+    String REQUEST_IS_NOT_MULTIPART = "Current requests is not a multipart requests";
 
     String PASSWORD_NOT_NULL = "user password mustn't be null";
 
@@ -109,5 +109,5 @@ public interface ValidationConstants {
 
     String TASKS_PER_PAGE_LESS_OR_EQUAL_100 = "tasks per page less or equal 100";
 
-    String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Http request not valid";
+    String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Http requests not valid";
 }
