@@ -4,7 +4,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import net.dunice.newsapi.errors.ValidationConstants;
+import net.dunice.newsapi.constants.ValidationConstants;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

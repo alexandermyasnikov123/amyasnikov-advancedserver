@@ -1,4 +1,4 @@
-package net.dunice.newsapi.errors;
+package net.dunice.newsapi.constants;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

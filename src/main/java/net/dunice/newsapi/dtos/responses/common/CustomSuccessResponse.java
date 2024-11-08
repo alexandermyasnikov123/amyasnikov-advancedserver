@@ -2,7 +2,7 @@ package net.dunice.newsapi.dtos.responses.common;
 
 import lombok.EqualsAndHashCode;
 import lombok.Value;
-import net.dunice.newsapi.errors.ErrorCodes;
+import net.dunice.newsapi.constants.ErrorCodes;
 
 @Value
 @EqualsAndHashCode(callSuper = true)

@@ -1,11 +1,10 @@
 package net.dunice.newsapi.entities;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.experimental.FieldDefaults;
+import net.dunice.newsapi.constants.Roles;
 import net.dunice.newsapi.validations.ValidEmail;
 import net.dunice.newsapi.validations.ValidPassword;
 import net.dunice.newsapi.validations.ValidUsername;
@@ -48,11 +48,11 @@ public class UserEntity implements UserDetails {
 
     String avatar;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    RoleEntity role;
+    @Embedded
+    Roles role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getName()));
+        return List.of(new SimpleGrantedAuthority(role.getRoleName()));
     }
 }

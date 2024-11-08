@@ -1,4 +1,4 @@
-package net.dunice.newsapi.errors;
+package net.dunice.newsapi.constants;
 
 public interface ValidationConstants {
     String SUCCESS = "All done correctly";

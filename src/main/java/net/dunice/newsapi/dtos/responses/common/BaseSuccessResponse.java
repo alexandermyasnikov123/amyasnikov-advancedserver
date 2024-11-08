@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-import net.dunice.newsapi.errors.ErrorCodes;
+import net.dunice.newsapi.constants.ErrorCodes;
 import java.util.Collection;
 import java.util.Date;
 

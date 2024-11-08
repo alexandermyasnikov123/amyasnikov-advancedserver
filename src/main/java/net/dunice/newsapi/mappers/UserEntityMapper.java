@@ -10,11 +10,11 @@ import org.mapstruct.MappingConstants;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserEntityMapper {
 
-    @Mapping(target = "role", expression = "java(new net.dunice.newsapi.entities.RoleEntity(request.role()))")
+    @Mapping(target = "role", expression = "java(net.dunice.newsapi.constants.Roles.forRoleName(request.role()))")
     UserEntity requestToEntity(RegisterRequest request);
 
     @Mapping(target = "id", source = "entity.uuid")
     @Mapping(target = "token", source = "token")
-    @Mapping(target = "role", expression = "java(entity.getRole().getName())")
+    @Mapping(target = "role", expression = "java(entity.getRole().getRoleName())")
     UserResponse entityToResponse(UserEntity entity, String token);
 }

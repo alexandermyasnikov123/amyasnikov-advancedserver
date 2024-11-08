@@ -6,10 +6,10 @@ import lombok.experimental.FieldDefaults;
 import net.dunice.newsapi.dtos.responses.UserResponse;
 import net.dunice.newsapi.entities.UserEntity;
 import net.dunice.newsapi.errors.UserEmailNotFoundException;
-import net.dunice.newsapi.errors.ValidationConstants;
+import net.dunice.newsapi.constants.ValidationConstants;
 import net.dunice.newsapi.mappers.UserEntityMapper;
 import net.dunice.newsapi.repositories.UsersRepository;
-import net.dunice.newsapi.services.JwtService;
+import net.dunice.newsapi.security.JwtService;
 import net.dunice.newsapi.services.UserEntityService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,7 +34,7 @@ public class UserEntityServiceImpl implements UserEntityService, UserDetailsServ
 
     @Override
     public UserResponse loadByUsername(String username) throws UsernameNotFoundException {
-        return mapper.entityToResponse(loadUserByUsername(username), jwtService.getCurrentToken());
+        return mapper.entityToResponse(loadUserByUsername(username), jwtService.generateToken());
     }
 
     @Override
@@ -43,6 +43,6 @@ public class UserEntityServiceImpl implements UserEntityService, UserDetailsServ
                 new UserEmailNotFoundException(ValidationConstants.USER_NOT_FOUND)
         );
 
-        return mapper.entityToResponse(entity, jwtService.getCurrentToken());
+        return mapper.entityToResponse(entity, jwtService.generateToken());
     }
 }
