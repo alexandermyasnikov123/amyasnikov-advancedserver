@@ -12,10 +12,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public interface UserEntityMapper {
 
     @Mapping(target = "password", expression = "java(encoder.encode(request.password()))")
+    @Mapping(target = "username", expression = "java(request.name())")
     UserEntity requestToEntity(RegisterRequest request, PasswordEncoder encoder);
 
     @Mapping(target = "id", source = "entity.uuid")
     @Mapping(target = "token", source = "token")
     @Mapping(target = "role", expression = "java(entity.getRole())")
+    @Mapping(target = "name", expression = "java(entity.getUsername())")
     UserResponse entityToResponse(UserEntity entity, String token);
 }

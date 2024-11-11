@@ -17,4 +17,22 @@
         <renameColumn tableName="user_entity" oldColumnName="role_name" newColumnName="role"/>
     </changeSet>
 
+    <changeSet id="3" author="Alexander Myasnikov">
+        <delete tableName="role_entity" />
+        <delete tableName="role_entity_users"/>
+    </changeSet>
+
+    <changeSet id="4" author="Alexander Myasnikov">
+        <delete tableName="role_entity" schemaName="public"/>
+        <delete tableName="role_entity_users" schemaName="public"/>
+    </changeSet>
+
+    <changeSet id="5" author="Alexander Myasnikov">
+        <dropAllForeignKeyConstraints baseTableName="user_entity"/>
+    </changeSet>
+
+    <changeSet id="6" author="Alexander Myasnikov">
+        <delete tableName="role_entity" schemaName="public"/>
+        <delete tableName="role_entity_users" schemaName="public"/>
+    </changeSet>
 </databaseChangeLog>
