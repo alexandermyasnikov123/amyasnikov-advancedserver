@@ -1,7 +1,6 @@
 package net.dunice.newsapi.entities;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -12,9 +11,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.experimental.FieldDefaults;
-import net.dunice.newsapi.constants.Roles;
 import net.dunice.newsapi.validations.ValidEmail;
 import net.dunice.newsapi.validations.ValidPassword;
+import net.dunice.newsapi.validations.ValidRole;
 import net.dunice.newsapi.validations.ValidUsername;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -48,11 +47,11 @@ public class UserEntity implements UserDetails {
 
     String avatar;
 
-    @Embedded
-    Roles role;
+    @ValidRole
+    String role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.getRoleName()));
+        return List.of(new SimpleGrantedAuthority(role));
     }
 }

@@ -44,6 +44,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:$jwtVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jwtVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jwtVersion")
+	implementation("org.liquibase:liquibase-core")
 }
 
 tasks.withType<Test> {
