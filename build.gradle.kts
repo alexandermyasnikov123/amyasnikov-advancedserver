@@ -24,10 +24,14 @@ repositories {
 }
 
 dependencies {
+	val mapstructVersion = "1.6.2"
+	val jwtVersion = "0.12.6"
+
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
@@ -35,6 +39,11 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("org.mapstruct:mapstruct:$mapstructVersion")
+	annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+	implementation("io.jsonwebtoken:jjwt-api:$jwtVersion")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jwtVersion")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jwtVersion")
 }
 
 tasks.withType<Test> {
