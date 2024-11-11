@@ -2,8 +2,6 @@ package net.dunice.newsapi.services.impls;
 
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -83,6 +80,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public UserResponse loginUser(LoginRequest request) {
         UserResponse response = loadByEmail(request.email());
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(response.name(), request.password())
         );
