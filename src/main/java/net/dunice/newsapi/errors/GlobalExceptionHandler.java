@@ -19,15 +19,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = BadCredentialsException.class)
     public ResponseEntity<BaseSuccessResponse> handleAuthenticationException(BadCredentialsException ignored) {
-        return ResponseEntity.badRequest()
-                .body(BaseSuccessResponse.error(List.of(ErrorCodes.USER_PASSWORD_NOT_VALID.getStatusCode())));
+        return ResponseEntity
+                .badRequest()
+                .body(BaseSuccessResponse.error(ErrorCodes.USER_PASSWORD_NOT_VALID.getStatusCode()));
     }
 
     @ExceptionHandler(value = ErrorCodesException.class)
     public ResponseEntity<BaseSuccessResponse> handleErrorCodesExceptions(ErrorCodesException exception) {
         Integer statusCode = exception.getErrorCodes().getStatusCode();
-        return ResponseEntity.badRequest()
-                .body(BaseSuccessResponse.error(List.of(statusCode)));
+        return ResponseEntity
+                .badRequest()
+                .body(BaseSuccessResponse.error(statusCode));
     }
 
     @ExceptionHandler(value = ConstraintViolationException.class)
