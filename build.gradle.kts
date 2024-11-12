@@ -45,6 +45,7 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jwtVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jwtVersion")
 	implementation("org.liquibase:liquibase-core")
+	implementation("com.github.depsypher:pngtastic:1.7")
 }
 
 tasks.withType<Test> {
