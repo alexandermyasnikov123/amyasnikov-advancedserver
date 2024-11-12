@@ -1,6 +1,7 @@
 package net.dunice.newsapi.dtos.responses.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.jsonwebtoken.lang.Collections;
 import jakarta.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -33,5 +34,9 @@ public class BaseSuccessResponse {
         Integer statusCode = codes.stream().findFirst().orElseThrow();
         Date now = new Date();
         return new BaseSuccessResponse(statusCode, now, codes);
+    }
+
+    public static BaseSuccessResponse error(Integer... codes) {
+        return error(Collections.of(codes));
     }
 }

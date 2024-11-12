@@ -6,15 +6,18 @@ import net.dunice.newsapi.entities.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface UserEntityMapper {
 
-    @Mapping(target = "role", expression = "java(net.dunice.newsapi.constants.Roles.forRoleName(request.role()))")
-    UserEntity requestToEntity(RegisterRequest request);
+    @Mapping(target = "password", expression = "java(encoder.encode(request.password()))")
+    @Mapping(target = "username", expression = "java(request.name())")
+    UserEntity requestToEntity(RegisterRequest request, PasswordEncoder encoder);
 
     @Mapping(target = "id", source = "entity.uuid")
     @Mapping(target = "token", source = "token")
-    @Mapping(target = "role", expression = "java(entity.getRole().getRoleName())")
+    @Mapping(target = "role", expression = "java(entity.getRole())")
+    @Mapping(target = "name", expression = "java(entity.getUsername())")
     UserResponse entityToResponse(UserEntity entity, String token);
 }
