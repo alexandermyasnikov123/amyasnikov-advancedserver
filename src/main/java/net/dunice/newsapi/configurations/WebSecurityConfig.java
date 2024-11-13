@@ -12,7 +12,9 @@ import java.util.stream.Stream;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
-    private final String[] permittedEndpoints = Stream.of(AuthController.ENDPOINT)
+    private final String[] permittedEndpoints = Stream.of(
+            AuthController.ENDPOINT, "file"
+            )
             .map("%s/**"::formatted)
             .toArray(String[]::new);
 
