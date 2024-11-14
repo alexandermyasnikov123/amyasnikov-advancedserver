@@ -3,6 +3,7 @@ package net.dunice.newsapi.services;
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
 import net.dunice.newsapi.dtos.responses.UserResponse;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserAuthService extends UserDetailsService {
@@ -14,5 +15,5 @@ public interface UserAuthService extends UserDetailsService {
 
     UserResponse loginUser(LoginRequest request);
 
-    UserResponse loadCurrentUser();
+    AbstractAuthenticationToken generateAuthToken(String token);
 }

@@ -117,7 +117,9 @@ public enum ErrorCodes {
 
     NEWS_IMAGE_LENGTH(56, ValidationConstants.NEWS_IMAGE_LENGTH),
 
-    NEWS_ID_NULL(57, ValidationConstants.NEWS_ID_NULL);
+    NEWS_ID_NULL(57, ValidationConstants.NEWS_ID_NULL),
+
+    INVALID_JWT_TOKEN(58, ValidationConstants.INVALID_JWT_TOKEN);
 
     Integer statusCode;
 

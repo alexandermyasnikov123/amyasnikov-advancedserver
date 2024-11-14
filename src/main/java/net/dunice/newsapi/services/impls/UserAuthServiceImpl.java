@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
@@ -17,26 +18,28 @@ import net.dunice.newsapi.security.JwtService;
 import net.dunice.newsapi.services.UserAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Setter(onMethod_ = {@Autowired, @Lazy})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserAuthServiceImpl implements UserAuthService {
-    final UsersRepository repository;
+    UsersRepository repository;
 
-    final UserEntityMapper mapper;
+    UserEntityMapper mapper;
 
-    final JwtService jwtService;
+    JwtService jwtService;
 
-    final PasswordEncoder encoder;
+    PasswordEncoder encoder;
 
+    @NonFinal
+    @Setter(onMethod_ = {@Autowired, @Lazy})
     AuthenticationManager authenticationManager;
 
     @Override
@@ -49,7 +52,8 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public UserResponse loadByUsername(String username) {
         UserEntity user = loadUserByUsername(username);
-        return mapper.entityToResponse(user, jwtService.generateToken(user.getUsername()));
+        String token = jwtService.generateToken(user.getUsername(), user.getRole(), user.getUuid());
+        return mapper.entityToResponse(user, token);
     }
 
     @Override
@@ -58,7 +62,8 @@ public class UserAuthServiceImpl implements UserAuthService {
                 new ErrorCodesException(ErrorCodes.USER_NOT_FOUND)
         );
 
-        return mapper.entityToResponse(user, jwtService.generateToken(user.getUsername()));
+        String token = jwtService.generateToken(user.getUsername(), user.getRole(), user.getUuid());
+        return mapper.entityToResponse(user, token);
     }
 
     @Override
@@ -72,7 +77,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         UserEntity user = repository.save(mapper.requestToEntity(request, encoder));
-        String token = jwtService.generateToken(user.getUsername());
+        String token = jwtService.generateToken(user.getUsername(), user.getRole(), user.getUuid());
 
         return mapper.entityToResponse(user, token);
     }
@@ -85,17 +90,21 @@ public class UserAuthServiceImpl implements UserAuthService {
                 new UsernamePasswordAuthenticationToken(response.name(), request.password())
         );
 
-        String token = jwtService.generateToken(response.name());
+        String token = jwtService.generateToken(response.name(), response.role(), UUID.fromString(response.id()));
         return response.withToken(token);
     }
 
     @Override
-    public UserResponse loadCurrentUser() {
-        String username = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
+    public AbstractAuthenticationToken generateAuthToken(String token) {
+        String username = jwtService.extractUsername(token);
+        UserEntity user = loadUserByUsername(username);
 
-        return loadByUsername(username);
+        Boolean isTokenValid = jwtService.isTokenValid(token, user.getUsername(), user.getRole(), user.getUuid());
+
+        if (!isTokenValid) {
+            throw new ErrorCodesException(ErrorCodes.INVALID_JWT_TOKEN);
+        }
+
+        return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
     }
 }

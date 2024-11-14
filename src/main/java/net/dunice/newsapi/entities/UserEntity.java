@@ -30,6 +30,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserEntity implements UserDetails {
+    public static final int MIN_AVATAR_LENGTH = 3;
+
+    public static final int MAX_AVATAR_LENGTH = 130;
+
     @Id
     @GeneratedValue
     UUID uuid;
