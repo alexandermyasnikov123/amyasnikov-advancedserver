@@ -110,4 +110,6 @@ public interface ValidationConstants {
     String TASKS_PER_PAGE_LESS_OR_EQUAL_100 = "tasks per page less or equal 100";
 
     String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Http request not valid";
+
+    String INVALID_JWT_TOKEN = "Invalid JWT token. Can't authenticate unknown user";
 }

@@ -16,12 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = AuthController.ENDPOINT)
+@RequestMapping(value = "auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
-    public static final String ENDPOINT = "auth";
-
     private final UserAuthService service;
 
     @PostMapping(value = "login")

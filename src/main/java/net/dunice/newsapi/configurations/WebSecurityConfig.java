@@ -1,28 +1,40 @@
 package net.dunice.newsapi.configurations;
 
-import net.dunice.newsapi.controllers.AuthController;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import net.dunice.newsapi.security.JwtSecurityFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import java.util.stream.Stream;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebSecurityConfig {
-    private final String[] permittedEndpoints = Stream.of(
-            AuthController.ENDPOINT, "file"
-            )
-            .map("%s/**"::formatted)
-            .toArray(String[]::new);
+    String[] permittedEndpoints = {"auth/**", "file/{path}"};
+
+    String[] authenticatedEndpoints = {"file/uploadFile"};
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain getFilterChain(
+            HttpSecurity http,
+            JwtSecurityFilter filter,
+            AuthenticationProvider provider
+    ) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(customizer -> customizer.requestMatchers(permittedEndpoints).permitAll())
+                .authorizeHttpRequests(customizer -> customizer
+                        .requestMatchers(authenticatedEndpoints).authenticated()
+                        .requestMatchers(permittedEndpoints).permitAll())
+                .authenticationProvider(provider)
+                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 }

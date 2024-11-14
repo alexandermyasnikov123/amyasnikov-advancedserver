@@ -1,11 +1,11 @@
 package net.dunice.newsapi.security;
 
-import java.util.Map;
+import java.util.UUID;
 
 public interface JwtService {
     String extractUsername(String token);
 
-    String generateToken(String username);
+    Boolean isTokenValid(String token, String username, String role, UUID uuid);
 
-    String generateToken(String username, Map<String, Object> extraClaims);
+    String generateToken(String username, String role, UUID uuid);
 }
