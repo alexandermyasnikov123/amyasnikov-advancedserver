@@ -9,7 +9,10 @@ import lombok.experimental.NonFinal;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
-import net.dunice.newsapi.dtos.responses.UserResponse;
+import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
+import net.dunice.newsapi.dtos.responses.AuthUserResponse;
+import net.dunice.newsapi.dtos.responses.DataResponse;
+import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.entities.UserEntity;
 import net.dunice.newsapi.errors.ErrorCodesException;
 import net.dunice.newsapi.mappers.UserEntityMapper;
@@ -23,6 +26,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -43,32 +47,50 @@ public class UserAuthServiceImpl implements UserAuthService {
     AuthenticationManager authenticationManager;
 
     @Override
-    public UserEntity loadUserByUsername(String username) {
-        return repository.findUserEntityByUsername(username).orElseThrow(() ->
+    public DataResponse<List<PublicUserResponse>> loadAllUsers() {
+        List<PublicUserResponse> entities = repository.findAll().stream()
+                .map(mapper::entityToPublicResponse)
+                .toList();
+
+        return new DataResponse<>(entities);
+    }
+
+    @Override
+    public PublicUserResponse loadUserByUuid(UUID uuid) {
+        UserEntity entity = repository.findById(uuid).orElseThrow(() ->
                 new ErrorCodesException(ErrorCodes.USER_NOT_FOUND)
         );
+        return mapper.entityToPublicResponse(entity);
     }
 
     @Override
-    public UserResponse loadByUsername(String username) {
-        UserEntity user = loadUserByUsername(username);
-        String token = jwtService.generateToken(user.getUsername(), user.getRole(), user.getUuid());
-        return mapper.entityToResponse(user, token);
-    }
-
-    @Override
-    public UserResponse loadByEmail(String email) {
+    public AuthUserResponse loadByEmail(String email) {
         UserEntity user = repository.findUserEntityByEmail(email).orElseThrow(() ->
                 new ErrorCodesException(ErrorCodes.USER_NOT_FOUND)
         );
 
         String token = jwtService.generateToken(user.getUsername(), user.getRole(), user.getUuid());
-        return mapper.entityToResponse(user, token);
+        return mapper.entityToUserResponse(user, token);
     }
 
     @Override
     @Transactional
-    public UserResponse registerUser(RegisterRequest request) {
+    public DataResponse<PublicUserResponse> updateUser(UUID uuid, UpdateUserRequest request) {
+        UserEntity entity = repository.save(mapper.updateRequestToEntity(uuid, request));
+        PublicUserResponse response = mapper.entityToPublicResponse(entity);
+
+        return new DataResponse<>(response);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserByUsername(String username) {
+        repository.deleteUserEntityByUsername(username);
+    }
+
+    @Override
+    @Transactional
+    public AuthUserResponse registerUser(RegisterRequest request) {
         Supplier<Boolean> hasUserWithUsername = () -> repository.findUserEntityByUsername(request.name()).isPresent();
         Supplier<Boolean> hasUserWithEmail = () -> repository.findUserEntityByEmail(request.email()).isPresent();
 
@@ -76,15 +98,15 @@ public class UserAuthServiceImpl implements UserAuthService {
             throw new ErrorCodesException(ErrorCodes.USER_ALREADY_EXISTS);
         }
 
-        UserEntity user = repository.save(mapper.requestToEntity(request, encoder));
+        UserEntity user = repository.save(mapper.registerRequestToEntity(request, encoder));
         String token = jwtService.generateToken(user.getUsername(), user.getRole(), user.getUuid());
 
-        return mapper.entityToResponse(user, token);
+        return mapper.entityToUserResponse(user, token);
     }
 
     @Override
-    public UserResponse loginUser(LoginRequest request) {
-        UserResponse response = loadByEmail(request.email());
+    public AuthUserResponse loginUser(LoginRequest request) {
+        AuthUserResponse response = loadByEmail(request.email());
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(response.name(), request.password())
@@ -106,5 +128,12 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+    }
+
+    @Override
+    public UserEntity loadUserByUsername(String username) {
+        return repository.findUserEntityByUsername(username).orElseThrow(() ->
+                new ErrorCodesException(ErrorCodes.USER_NOT_FOUND)
+        );
     }
 }

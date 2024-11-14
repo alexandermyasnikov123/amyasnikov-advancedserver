@@ -2,18 +2,29 @@ package net.dunice.newsapi.services;
 
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
-import net.dunice.newsapi.dtos.responses.UserResponse;
+import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
+import net.dunice.newsapi.dtos.responses.AuthUserResponse;
+import net.dunice.newsapi.dtos.responses.DataResponse;
+import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import java.util.List;
+import java.util.UUID;
 
 public interface UserAuthService extends UserDetailsService {
-    UserResponse loadByUsername(String username);
+    DataResponse<List<PublicUserResponse>> loadAllUsers();
 
-    UserResponse loadByEmail(String email);
+    PublicUserResponse loadUserByUuid(UUID uuid);
 
-    UserResponse registerUser(RegisterRequest request);
+    AuthUserResponse loadByEmail(String email);
 
-    UserResponse loginUser(LoginRequest request);
+    DataResponse<PublicUserResponse> updateUser(UUID uuid, UpdateUserRequest request);
+
+    AuthUserResponse registerUser(RegisterRequest request);
+
+    AuthUserResponse loginUser(LoginRequest request);
 
     AbstractAuthenticationToken generateAuthToken(String token);
+
+    void deleteUserByUsername(String username);
 }

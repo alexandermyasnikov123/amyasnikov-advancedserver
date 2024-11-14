@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
-import net.dunice.newsapi.dtos.responses.UserResponse;
+import net.dunice.newsapi.dtos.responses.AuthUserResponse;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
 import net.dunice.newsapi.services.UserAuthService;
@@ -24,13 +24,13 @@ public class AuthController {
 
     @PostMapping(value = "login")
     public ResponseEntity<BaseSuccessResponse> login(@Valid @RequestBody LoginRequest request) {
-        UserResponse response = service.loginUser(request);
+        AuthUserResponse response = service.loginUser(request);
         return ResponseEntity.ok(new CustomSuccessResponse<>(response));
     }
 
     @PostMapping(value = "register")
     public ResponseEntity<BaseSuccessResponse> register(@Valid @RequestBody RegisterRequest request) {
-        UserResponse response = service.registerUser(request);
+        AuthUserResponse response = service.registerUser(request);
         return ResponseEntity.ok(new CustomSuccessResponse<>(response));
     }
 }
