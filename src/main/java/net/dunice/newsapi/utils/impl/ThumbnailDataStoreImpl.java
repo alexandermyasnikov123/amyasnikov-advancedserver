@@ -1,8 +1,12 @@
 package net.dunice.newsapi.utils.impl;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import net.coobird.thumbnailator.Thumbnails;
 import net.dunice.newsapi.utils.MultipartFileDataStore;
-import org.springframework.beans.factory.annotation.Value;
+import net.dunice.newsapi.utils.UploadProperties;
+import net.dunice.newsapi.utils.UserProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
@@ -18,33 +22,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Component
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
-    @Value("${upload.pattern}")
-    private String namePattern;
+    UploadProperties uploadProperties;
 
-    @Value("${upload.file-protocol}")
-    private String fileProtocol;
-
-    @Value("${upload.image-extension}")
-    private String imageExtension = ".jpg";
-
-    @Value("${user.dir}/${upload.dir}")
-    private String outputDirectoryPath;
-
-    @Value("${upload.scale-factor}")
-    private Double scaleFactor;
-
-    @Value("${upload.max-available-size-bytes}")
-    private Integer maxAvailableSizeBytes;
+    UserProperties userProperties;
 
     @Override
     public URI compressAndStore(MultipartFile file) throws IOException {
-        Files.createDirectories(Paths.get(outputDirectoryPath));
+        Files.createDirectories(Paths.get(getOutputPath()));
 
-        String fileSimpleName = new SimpleDateFormat(namePattern)
-                .format(new Date()) + imageExtension;
+        String fileSimpleName = new SimpleDateFormat(uploadProperties.getPattern())
+                .format(new Date()) + uploadProperties.getImageExtension();
 
-        String filePath = "%s/%s".formatted(outputDirectoryPath, fileSimpleName);
+        String filePath = "%s/%s".formatted(getOutputPath(), fileSimpleName);
 
         File output = new File(filePath);
         saveAndCompressFileIfAbsent(file, output);
@@ -53,23 +45,27 @@ public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
                 .fromCurrentContextPath()
                 .toUriString();
 
-        return URI.create("%s/%s/%s".formatted(outputUrl, fileProtocol, fileSimpleName));
+        return URI.create("%s/%s/%s".formatted(outputUrl, uploadProperties.getFileProtocol(), fileSimpleName));
     }
 
     @Override
     public Resource loadCompressedFile(String filename) throws MalformedURLException {
-        String filePath = "%s/%s".formatted(outputDirectoryPath, filename);
-        return new UrlResource(fileProtocol, filePath);
+        String filePath = "%s/%s".formatted(getOutputPath(), filename);
+        return new UrlResource(uploadProperties.getFileProtocol(), filePath);
+    }
+
+    private String getOutputPath() {
+        return "%s/%s".formatted(userProperties.getDir(), uploadProperties.getDir());
     }
 
     private void saveAndCompressFileIfAbsent(MultipartFile file, File outputFile) throws IOException {
-        if (file.getSize() < maxAvailableSizeBytes) {
+        if (file.getSize() < uploadProperties.getMaxAvailableSizeBytes()) {
             file.transferTo(outputFile);
             return;
         }
 
         Thumbnails.of(file.getInputStream())
-                .scale(scaleFactor)
+                .scale(uploadProperties.getScaleFactor())
                 .toFile(outputFile);
     }
 }
