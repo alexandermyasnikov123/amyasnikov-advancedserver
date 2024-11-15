@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     String[] permittedEndpoints = {"auth/**", "file/{path}"};
 
-    String[] authenticatedEndpoints = {"file/uploadFile"};
+    String[] authenticatedEndpoints = {"file/uploadFile", "user/**"};
 
     @Bean
     public SecurityFilterChain getFilterChain(

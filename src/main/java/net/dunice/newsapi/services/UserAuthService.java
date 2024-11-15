@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserAuthService extends UserDetailsService {
-    DataResponse<List<PublicUserResponse>> loadAllUsers();
+    List<PublicUserResponse> loadAllUsers();
 
     PublicUserResponse loadUserByUuid(UUID uuid);
 

@@ -30,8 +30,8 @@ public interface UserEntityMapper {
     @Mapping(target = "name", expression = "java(entity.getUsername())")
     PublicUserResponse entityToPublicResponse(UserEntity entity);
 
-    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "password", expression = "java(passwordHash)")
     @Mapping(target = "uuid", source = "uuid")
     @Mapping(target = "username", expression = "java(request.name())")
-    UserEntity updateRequestToEntity(UUID uuid, UpdateUserRequest request);
+    UserEntity updateRequestToEntity(UUID uuid, String passwordHash, UpdateUserRequest request);
 }

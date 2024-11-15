@@ -47,12 +47,10 @@ public class UserAuthServiceImpl implements UserAuthService {
     AuthenticationManager authenticationManager;
 
     @Override
-    public DataResponse<List<PublicUserResponse>> loadAllUsers() {
-        List<PublicUserResponse> entities = repository.findAll().stream()
+    public List<PublicUserResponse> loadAllUsers() {
+        return repository.findAll().stream()
                 .map(mapper::entityToPublicResponse)
                 .toList();
-
-        return new DataResponse<>(entities);
     }
 
     @Override
@@ -76,7 +74,11 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     @Transactional
     public DataResponse<PublicUserResponse> updateUser(UUID uuid, UpdateUserRequest request) {
-        UserEntity entity = repository.save(mapper.updateRequestToEntity(uuid, request));
+        UserEntity original = repository.findById(uuid).orElseThrow(() ->
+                new ErrorCodesException(ErrorCodes.USER_NOT_FOUND)
+        );
+
+        UserEntity entity = repository.save(mapper.updateRequestToEntity(uuid, original.getPassword(), request));
         PublicUserResponse response = mapper.entityToPublicResponse(entity);
 
         return new DataResponse<>(response);
