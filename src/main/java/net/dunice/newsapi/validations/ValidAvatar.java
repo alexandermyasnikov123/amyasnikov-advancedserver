@@ -10,19 +10,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@NotBlank(message = ValidationConstants.USER_NAME_HAS_TO_BE_PRESENT)
+@NotBlank(message = ValidationConstants.USER_AVATAR_NOT_NULL)
 @Size(
-        min = ValidUsername.MIN_USERNAME_LENGTH,
-        max = ValidUsername.MAX_USERNAME_LENGTH,
-        message = ValidationConstants.USERNAME_SIZE_NOT_VALID
+        min = ValidAvatar.MIN_AVATAR_LENGTH,
+        max = ValidAvatar.MAX_AVATAR_LENGTH,
+        message = ValidationConstants.USER_AVATAR_NOT_VALID
 )
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidUsername {
-    int MIN_USERNAME_LENGTH = 3;
+public @interface ValidAvatar {
+    int MIN_AVATAR_LENGTH = 3;
 
-    int MAX_USERNAME_LENGTH = 25;
+    int MAX_AVATAR_LENGTH = 130;
 
     String message() default "";
 

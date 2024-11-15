@@ -46,6 +46,7 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jwtVersion")
 	implementation("org.liquibase:liquibase-core")
 	implementation("net.coobird:thumbnailator:0.4.20")
+	implementation("com.h2database:h2")
 }
 
 tasks.withType<Test> {

@@ -11,8 +11,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.experimental.FieldDefaults;
+import net.dunice.newsapi.validations.ValidAvatar;
 import net.dunice.newsapi.validations.ValidEmail;
-import net.dunice.newsapi.validations.ValidPassword;
+import net.dunice.newsapi.validations.ValidRegisterPassword;
 import net.dunice.newsapi.validations.ValidRole;
 import net.dunice.newsapi.validations.ValidUsername;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,10 +31,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserEntity implements UserDetails {
-    public static final int MIN_AVATAR_LENGTH = 3;
-
-    public static final int MAX_AVATAR_LENGTH = 130;
-
     @Id
     @GeneratedValue
     UUID uuid;
@@ -46,9 +43,10 @@ public class UserEntity implements UserDetails {
     @ValidEmail
     String email;
 
-    @ValidPassword
+    @ValidRegisterPassword
     String password;
 
+    @ValidAvatar
     String avatar;
 
     @ValidRole

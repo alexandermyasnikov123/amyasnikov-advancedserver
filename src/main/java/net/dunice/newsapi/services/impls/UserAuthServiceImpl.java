@@ -11,7 +11,6 @@ import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
 import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
 import net.dunice.newsapi.dtos.responses.AuthUserResponse;
-import net.dunice.newsapi.dtos.responses.DataResponse;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.entities.UserEntity;
 import net.dunice.newsapi.errors.ErrorCodesException;
@@ -54,8 +53,8 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    public PublicUserResponse loadUserByUuid(UUID uuid) {
-        UserEntity entity = repository.findById(uuid).orElseThrow(() ->
+    public PublicUserResponse loadUserByUuid(String uuid) {
+        UserEntity entity = repository.findById(UUID.fromString(uuid)).orElseThrow(() ->
                 new ErrorCodesException(ErrorCodes.USER_NOT_FOUND)
         );
         return mapper.entityToPublicResponse(entity);
@@ -73,15 +72,14 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     @Transactional
-    public DataResponse<PublicUserResponse> updateUser(UUID uuid, UpdateUserRequest request) {
-        UserEntity original = repository.findById(uuid).orElseThrow(() ->
+    public PublicUserResponse updateUser(String uuid, UpdateUserRequest request) {
+        UUID mappedUuid = UUID.fromString(uuid);
+        UserEntity original = repository.findById(mappedUuid).orElseThrow(() ->
                 new ErrorCodesException(ErrorCodes.USER_NOT_FOUND)
         );
+        UserEntity entity = repository.save(mapper.updateRequestToEntity(mappedUuid, original.getPassword(), request));
 
-        UserEntity entity = repository.save(mapper.updateRequestToEntity(uuid, original.getPassword(), request));
-        PublicUserResponse response = mapper.entityToPublicResponse(entity);
-
-        return new DataResponse<>(response);
+        return mapper.entityToPublicResponse(entity);
     }
 
     @Override
@@ -101,7 +99,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
 
         UserEntity user = repository.save(mapper.registerRequestToEntity(request, encoder));
-        String token = jwtService.generateToken(user.getUsername(), user.getRole(), user.getUuid());
+        String token = generateBearerTokenHeader(user.getUsername(), user.getRole(), user.getUuid());
 
         return mapper.entityToUserResponse(user, token);
     }
@@ -114,7 +112,7 @@ public class UserAuthServiceImpl implements UserAuthService {
                 new UsernamePasswordAuthenticationToken(response.name(), request.password())
         );
 
-        String token = jwtService.generateToken(response.name(), response.role(), UUID.fromString(response.id()));
+        String token = generateBearerTokenHeader(response.name(), response.role(), UUID.fromString(response.id()));
         return response.withToken(token);
     }
 
@@ -137,5 +135,10 @@ public class UserAuthServiceImpl implements UserAuthService {
         return repository.findUserEntityByUsername(username).orElseThrow(() ->
                 new ErrorCodesException(ErrorCodes.USER_NOT_FOUND)
         );
+    }
+
+    private String generateBearerTokenHeader(String username, String role, UUID uuid) {
+        String bearerPrefix = "Bearer ";
+        return bearerPrefix + jwtService.generateToken(username, role, uuid);
     }
 }

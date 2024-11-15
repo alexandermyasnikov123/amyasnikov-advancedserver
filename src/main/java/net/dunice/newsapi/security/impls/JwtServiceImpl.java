@@ -55,11 +55,11 @@ public class JwtServiceImpl implements JwtService {
         Map<String, Object> claims = createClaims(username, role, uuid);
 
         return Jwts.builder()
-                .claims(claims)
                 .subject(username)
+                .claims(claims)
                 .issuedAt(now)
                 .expiration(expiration)
-                .signWith(decodeSigningKey(), Jwts.SIG.HS256)
+                .signWith(decodeSigningKey(), Jwts.SIG.HS512)
                 .compact();
     }
 

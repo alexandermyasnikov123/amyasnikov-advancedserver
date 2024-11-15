@@ -1,13 +1,13 @@
 package net.dunice.newsapi.dtos.requests;
 
-import jakarta.annotation.Nullable;
+import net.dunice.newsapi.validations.ValidAvatar;
 import net.dunice.newsapi.validations.ValidEmail;
-import net.dunice.newsapi.validations.ValidPassword;
+import net.dunice.newsapi.validations.ValidRegisterPassword;
 import net.dunice.newsapi.validations.ValidRole;
 import net.dunice.newsapi.validations.ValidUsername;
 
 public record RegisterRequest(
-        @ValidPassword
+        @ValidRegisterPassword
         String password,
         @ValidRole
         String role,
@@ -15,7 +15,7 @@ public record RegisterRequest(
         String name,
         @ValidEmail
         String email,
-        @Nullable
+        @ValidAvatar
         String avatar
 ) {
 }

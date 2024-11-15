@@ -31,7 +31,7 @@ public class BaseSuccessResponse {
     }
 
     public static BaseSuccessResponse error(Collection<Integer> codes) {
-        Integer statusCode = codes.stream().findFirst().orElseThrow();
+        Integer statusCode = codes.stream().min(Integer::compareTo).orElseThrow();
         Date now = new Date();
         return new BaseSuccessResponse(statusCode, now, codes);
     }

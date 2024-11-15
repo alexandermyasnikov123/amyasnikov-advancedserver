@@ -10,12 +10,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@NotBlank(message = ValidationConstants.USER_ROLE_NOT_NULL)
 @Size(
         min = ValidRole.MIN_ROLE_LENGTH,
         max = ValidRole.MAX_ROLE_LENGTH,
-        message = ValidationConstants.USER_ROLE_NOT_VALID
+        message = ValidationConstants.ROLE_SIZE_NOT_VALID
 )
-@NotBlank(message = ValidationConstants.USER_ROLE_NOT_NULL)
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
