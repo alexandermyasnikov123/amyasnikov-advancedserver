@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
     private ResponseEntity<BaseSuccessResponse> buildErrorResponse(Stream<String> messages) {
         Integer[] statusCodes = messages.map(message ->
                 errors.getOrDefault(message, ErrorCodes.UNKNOWN).getStatusCode()
-        ).toList().toArray(new Integer[0]);
+        ).toList().toArray(Integer[]::new);
 
         return ResponseEntity.badRequest().body(BaseSuccessResponse.error(statusCodes));
     }

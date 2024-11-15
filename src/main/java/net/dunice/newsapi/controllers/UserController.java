@@ -1,5 +1,6 @@
 package net.dunice.newsapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import net.dunice.newsapi.constants.ValidationConstants;
 import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
@@ -49,7 +50,7 @@ public class UserController {
     @PutMapping
     public ResponseEntity<BaseSuccessResponse> updateCurrentUser(
             Authentication authentication,
-            @RequestBody UpdateUserRequest request
+            @Valid @RequestBody UpdateUserRequest request
     ) {
         String uuid = extractUuidFrom(authentication);
         PublicUserResponse userResponse = service.updateUser(uuid, request);

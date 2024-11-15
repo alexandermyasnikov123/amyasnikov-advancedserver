@@ -4,6 +4,7 @@ import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import net.dunice.newsapi.constants.ValidationConstants;
 import java.lang.annotation.ElementType;
@@ -16,6 +17,7 @@ import java.lang.annotation.Target;
         max = ValidEmail.MAX_EMAIL_LENGTH,
         message = ValidationConstants.EMAIL_SIZE_NOT_VALID
 )
+@NotNull(message = ValidationConstants.USER_EMAIL_NOT_NULL)
 @NotBlank(message = ValidationConstants.USER_EMAIL_NOT_VALID)
 @Email(message = ValidationConstants.USER_EMAIL_NOT_VALID)
 @Constraint(validatedBy = {})

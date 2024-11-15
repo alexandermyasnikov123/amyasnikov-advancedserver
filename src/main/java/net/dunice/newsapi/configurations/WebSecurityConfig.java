@@ -2,7 +2,7 @@ package net.dunice.newsapi.configurations;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import net.dunice.newsapi.security.JwtSecurityFilter;
+import net.dunice.newsapi.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -24,7 +24,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain getFilterChain(
             HttpSecurity http,
-            JwtSecurityFilter filter,
+            JwtAuthenticationFilter filter,
             AuthenticationProvider provider
     ) throws Exception {
         return http

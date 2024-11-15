@@ -19,7 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-public class JwtSecurityFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer ";
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
@@ -35,6 +35,7 @@ public class JwtSecurityFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.isBlank(authHeader) || !authHeader.startsWith(BEARER_PREFIX)) {
+            SecurityContextHolder.clearContext();
             filterChain.doFilter(request, response);
             return;
         }
