@@ -24,5 +24,7 @@ public interface UserAuthService extends UserDetailsService {
 
     AbstractAuthenticationToken generateAuthToken(String token);
 
+    Boolean isTokenValid(String token);
+
     void deleteUserByUsername(String username);
 }

@@ -117,13 +117,19 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
+    public Boolean isTokenValid(String token) {
+        String username = jwtService.extractUsername(token);
+        UserEntity user = loadUserByUsername(username);
+
+        return jwtService.isTokenValid(token, user.getUsername(), user.getRole(), user.getUuid());
+    }
+
+    @Override
     public AbstractAuthenticationToken generateAuthToken(String token) {
         String username = jwtService.extractUsername(token);
         UserEntity user = loadUserByUsername(username);
 
-        Boolean isTokenValid = jwtService.isTokenValid(token, user.getUsername(), user.getRole(), user.getUuid());
-
-        if (!isTokenValid) {
+        if (!isTokenValid(token)) {
             throw new ErrorCodesException(ErrorCodes.INVALID_JWT_TOKEN);
         }
 

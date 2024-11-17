@@ -14,6 +14,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
@@ -26,6 +27,11 @@ import java.util.stream.Stream;
 public class GlobalExceptionHandler {
     private final Map<String, ErrorCodes> errors = Arrays.stream(ErrorCodes.values())
             .collect(Collectors.toMap(ErrorCodes::getMessage, errorCodes -> errorCodes));
+
+    @ExceptionHandler(value = HttpStatusCodeException.class)
+    public ResponseEntity<BaseSuccessResponse> handleStatusCodeExceptions(HttpStatusCodeException exception) {
+        return buildErrorResponse(Stream.of(exception.getStatusText()));
+    }
 
     @ExceptionHandler(value = BadCredentialsException.class)
     public ResponseEntity<BaseSuccessResponse> handleAuthenticationException() {
