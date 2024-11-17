@@ -19,8 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     String[] permittedEndpoints = {"auth/**", "file/{path}"};
 
-    String[] requireAuthEndpoints = {"file/uploadFile", "user/**"};
-
     @Bean
     public SecurityFilterChain getFilterChain(
             HttpSecurity http,
@@ -30,8 +28,8 @@ public class WebSecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(customizer -> customizer
-                        .requestMatchers(requireAuthEndpoints).authenticated()
-                        .requestMatchers(permittedEndpoints).permitAll())
+                        .requestMatchers(permittedEndpoints).permitAll()
+                        .anyRequest().authenticated())
                 .authenticationProvider(provider)
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

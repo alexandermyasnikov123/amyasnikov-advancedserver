@@ -1,4 +1,4 @@
-package net.dunice.newsapi.utils;
+package net.dunice.newsapi.configurations;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "upload")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UploadProperties {
+public class UploadConfigurationProperties {
     String pattern;
 
     String dir;

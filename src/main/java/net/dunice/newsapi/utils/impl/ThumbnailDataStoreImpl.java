@@ -4,9 +4,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import net.coobird.thumbnailator.Thumbnails;
+import net.dunice.newsapi.configurations.UploadConfigurationProperties;
+import net.dunice.newsapi.configurations.UserConfigurationProperties;
 import net.dunice.newsapi.utils.MultipartFileDataStore;
-import net.dunice.newsapi.utils.UploadProperties;
-import net.dunice.newsapi.utils.UserProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
@@ -25,9 +25,9 @@ import java.util.Date;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
-    UploadProperties uploadProperties;
+    UploadConfigurationProperties uploadProperties;
 
-    UserProperties userProperties;
+    UserConfigurationProperties userProperties;
 
     @Override
     public URI compressAndStore(MultipartFile file) throws IOException {

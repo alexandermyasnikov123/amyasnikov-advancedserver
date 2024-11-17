@@ -1,4 +1,4 @@
-package net.dunice.newsapi.utils;
+package net.dunice.newsapi.configurations;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 @Configuration
 @ConfigurationProperties(prefix = "user")
-public class UserProperties {
+public class UserConfigurationProperties {
     private String dir;
 }
