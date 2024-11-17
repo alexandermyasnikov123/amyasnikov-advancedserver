@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.MalformedURLException;
 
 public interface FilesService {
-    BaseSuccessResponse storeFile(MultipartFile file) throws Exception;
+    BaseSuccessResponse storeFile(MultipartFile file, String baseApiPath) throws Exception;
 
     Resource loadFile(String filename) throws MalformedURLException;
 }

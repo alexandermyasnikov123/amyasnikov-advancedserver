@@ -1,8 +1,7 @@
 package net.dunice.newsapi.configurations;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import net.dunice.newsapi.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -15,9 +14,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebSecurityConfig {
-    String[] permittedEndpoints = {"auth/**", "file/{path}"};
+    @Value("${permitted-endpoints}")
+    private String[] permittedEndpoints;
 
     @Bean
     public SecurityFilterChain getFilterChain(

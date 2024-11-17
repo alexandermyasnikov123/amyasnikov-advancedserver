@@ -11,7 +11,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.net.MalformedURLException;
-import java.net.URI;
 
 @Service
 @AllArgsConstructor
@@ -19,13 +18,13 @@ public class FilesServiceImpl implements FilesService {
     private final MultipartFileDataStore dataStore;
 
     @Override
-    public BaseSuccessResponse storeFile(MultipartFile file) throws Exception {
+    public BaseSuccessResponse storeFile(MultipartFile file, String baseApiPath) throws Exception {
         if (file.isEmpty()) {
             throw new ErrorCodesException(ErrorCodes.USER_AVATAR_NOT_VALID);
         }
 
-        URI resultingUri = dataStore.compressAndStore(file);
-        return new CustomSuccessResponse<>(resultingUri.getPath());
+        String resultingPathUrl = dataStore.compressAndStore(file, baseApiPath);
+        return new CustomSuccessResponse<>(resultingPathUrl);
     }
 
     @Override

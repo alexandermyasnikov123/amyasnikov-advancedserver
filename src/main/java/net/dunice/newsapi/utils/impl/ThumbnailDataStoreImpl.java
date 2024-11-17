@@ -11,11 +11,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -30,7 +28,7 @@ public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
     UserConfigurationProperties userProperties;
 
     @Override
-    public URI compressAndStore(MultipartFile file) throws IOException {
+    public String compressAndStore(MultipartFile file, String baseApiPath) throws IOException {
         Files.createDirectories(Paths.get(getOutputPath()));
 
         String fileSimpleName = new SimpleDateFormat(uploadProperties.getPattern())
@@ -41,11 +39,7 @@ public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
         File output = new File(filePath);
         saveAndCompressFileIfAbsent(file, output);
 
-        String outputUrl = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .toUriString();
-
-        return URI.create("%s/%s/%s".formatted(outputUrl, uploadProperties.getFileProtocol(), fileSimpleName));
+        return "%s/%s/%s".formatted(baseApiPath, uploadProperties.getFileProtocol(), fileSimpleName);
     }
 
     @Override
