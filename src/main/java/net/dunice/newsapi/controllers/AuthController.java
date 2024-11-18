@@ -1,14 +1,13 @@
 package net.dunice.newsapi.controllers;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
 import net.dunice.newsapi.dtos.responses.AuthUserResponse;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
-import net.dunice.newsapi.services.UserAuthService;
+import net.dunice.newsapi.services.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,10 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "auth")
-@RequiredArgsConstructor
-@Slf4j
+@AllArgsConstructor
 public class AuthController {
-    private final UserAuthService service;
+    private final AuthService service;
 
     @PostMapping(value = "login")
     public ResponseEntity<BaseSuccessResponse> login(@Valid @RequestBody LoginRequest request) {

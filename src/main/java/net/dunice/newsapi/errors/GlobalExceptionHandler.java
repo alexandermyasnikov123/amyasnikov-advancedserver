@@ -2,7 +2,6 @@ package net.dunice.newsapi.errors;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import lombok.extern.slf4j.Slf4j;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.constants.ValidationConstants;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
@@ -22,7 +21,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     private final Map<String, ErrorCodes> errors = Arrays.stream(ErrorCodes.values())

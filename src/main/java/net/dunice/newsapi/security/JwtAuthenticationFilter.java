@@ -4,11 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.Setter;
-import net.dunice.newsapi.services.UserAuthService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import net.dunice.newsapi.services.AuthService;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,13 +18,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Component
+@AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer ";
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
-    @Setter(onMethod_ = {@Autowired, @Lazy})
-    private UserAuthService userAuthService;
+    private final AuthService service;
 
     @Override
     protected void doFilterInternal(
@@ -44,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
 
         Supplier<String> token = () -> authHeader.substring(BEARER_PREFIX.length());
-        Supplier<Boolean> isTokenValid = () -> userAuthService.isTokenValid(token.get());
+        Supplier<Boolean> isTokenValid = () -> service.isTokenValid(token.get());
         Boolean hasBearerToken = authHeader != null && authHeader.startsWith(BEARER_PREFIX);
 
         return hasBearerToken && isTokenValid.get() ? Optional.of(token.get()) : Optional.empty();
@@ -52,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private void filterRequest(String jwtToken, HttpServletRequest request) {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            AbstractAuthenticationToken authToken = userAuthService.generateAuthToken(jwtToken);
+            AbstractAuthenticationToken authToken = service.generateAuthToken(jwtToken);
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContext context = SecurityContextHolder.createEmptyContext();
