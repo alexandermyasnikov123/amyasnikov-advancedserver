@@ -8,7 +8,7 @@ import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
 import net.dunice.newsapi.entities.UserEntity;
-import net.dunice.newsapi.services.UserAuthService;
+import net.dunice.newsapi.services.UserService;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,7 +25,7 @@ import java.security.Principal;
 @RequestMapping(value = "user")
 @AllArgsConstructor
 public class UserController {
-    private final UserAuthService service;
+    private final UserService service;
 
     @GetMapping
     public ResponseEntity<BaseSuccessResponse> loadAllUsers() {

@@ -1,7 +1,5 @@
 package net.dunice.newsapi.dtos.requests;
 
-import jakarta.validation.constraints.NotNull;
-import net.dunice.newsapi.constants.ValidationConstants;
 import net.dunice.newsapi.validations.ValidAvatar;
 import net.dunice.newsapi.validations.ValidEmail;
 import net.dunice.newsapi.validations.ValidRole;

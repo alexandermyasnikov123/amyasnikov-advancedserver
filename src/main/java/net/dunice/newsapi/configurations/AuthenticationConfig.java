@@ -1,6 +1,6 @@
 package net.dunice.newsapi.configurations;
 
-import net.dunice.newsapi.services.UserAuthService;
+import net.dunice.newsapi.services.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +20,7 @@ public class AuthenticationConfig {
 
     @Bean
     public AuthenticationProvider getAuthenticationProvider(
-            UserAuthService service,
+            UserService service,
             PasswordEncoder encoder
     ) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(encoder);

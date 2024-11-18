@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @NoArgsConstructor
 @Configuration
-@ConfigurationProperties(prefix = "user")
-public class UserConfigurationProperties {
-    private String dir;
+@ConfigurationProperties(prefix = "endpoints")
+public class EndpointsConfiguration {
+    private String[] permittedEndpoints;
 }

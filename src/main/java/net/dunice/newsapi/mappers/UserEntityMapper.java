@@ -20,12 +20,6 @@ public interface UserEntityMapper {
     UserEntity registerRequestToEntity(RegisterRequest request, PasswordEncoder encoder);
 
     @Mapping(target = "id", source = "entity.uuid")
-    @Mapping(target = "token", source = "token")
-    @Mapping(target = "role", expression = "java(entity.getRole())")
-    @Mapping(target = "name", expression = "java(entity.getUsername())")
-    AuthUserResponse entityToUserResponse(UserEntity entity, String token);
-
-    @Mapping(target = "id", source = "entity.uuid")
     @Mapping(target = "role", expression = "java(entity.getRole())")
     @Mapping(target = "name", expression = "java(entity.getUsername())")
     PublicUserResponse entityToPublicResponse(UserEntity entity);
@@ -34,4 +28,7 @@ public interface UserEntityMapper {
     @Mapping(target = "uuid", source = "uuid")
     @Mapping(target = "username", expression = "java(request.name())")
     UserEntity updateRequestToEntity(UUID uuid, String passwordHash, UpdateUserRequest request);
+
+    @Mapping(target = "token", source = "token")
+    AuthUserResponse publicResponseToAuth(PublicUserResponse response, String token);
 }
