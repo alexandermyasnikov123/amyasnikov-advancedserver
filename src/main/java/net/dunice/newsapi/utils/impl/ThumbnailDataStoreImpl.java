@@ -48,6 +48,13 @@ public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
         return new UrlResource(uploadProperties.getFileProtocol(), filePath);
     }
 
+    @Override
+    public Boolean deleteFileByName(String name) {
+        String path = "%s/%s".formatted(getOutputPath(), name);
+        File file = new File(path);
+        return file.delete();
+    }
+
     private String getOutputPath() {
         return "%s/%s".formatted(userProperties.getDir(), uploadProperties.getDir());
     }

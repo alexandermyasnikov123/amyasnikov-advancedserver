@@ -9,4 +9,7 @@ public interface MultipartFileDataStore {
     String compressAndStore(MultipartFile file, String baseApiPath) throws IOException;
 
     Resource loadCompressedFile(String filename) throws MalformedURLException;
+
+    @SuppressWarnings("UnusedReturnValue")
+    Boolean deleteFileByName(String name);
 }

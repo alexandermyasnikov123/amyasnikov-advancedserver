@@ -1,6 +1,7 @@
 package net.dunice.newsapi.services.impls;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
@@ -11,6 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.net.MalformedURLException;
+import java.nio.file.Paths;
 
 @Service
 @AllArgsConstructor
@@ -30,5 +32,12 @@ public class FilesServiceImpl implements FilesService {
     @Override
     public Resource loadFile(String filename) throws MalformedURLException {
         return dataStore.loadCompressedFile(filename);
+    }
+
+    @Override
+    @SneakyThrows
+    public void deleteFileByUrl(String url) {
+        String fileName = Paths.get(url).getFileName().toString();
+        dataStore.deleteFileByName(fileName);
     }
 }

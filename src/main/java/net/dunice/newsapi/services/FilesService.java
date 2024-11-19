@@ -9,4 +9,6 @@ public interface FilesService {
     BaseSuccessResponse storeFile(MultipartFile file, String baseApiPath) throws Exception;
 
     Resource loadFile(String filename) throws MalformedURLException;
+
+    void deleteFileByUrl(String url);
 }

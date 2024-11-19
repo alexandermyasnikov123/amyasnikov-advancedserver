@@ -11,7 +11,6 @@ public record UpdateUserRequest(
         @ValidUsername
         String name,
         @ValidEmail
-
         String email,
         @ValidRole
         String role

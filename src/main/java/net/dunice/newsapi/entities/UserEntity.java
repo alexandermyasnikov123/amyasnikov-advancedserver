@@ -2,6 +2,7 @@ package net.dunice.newsapi.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
@@ -11,11 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.experimental.FieldDefaults;
-import net.dunice.newsapi.validations.ValidAvatar;
-import net.dunice.newsapi.validations.ValidEmail;
-import net.dunice.newsapi.validations.ValidRegisterPassword;
-import net.dunice.newsapi.validations.ValidRole;
-import net.dunice.newsapi.validations.ValidUsername;
+import net.dunice.newsapi.entities.callbacks.UserEntityCallbacks;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,26 +27,22 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EntityListeners(value = UserEntityCallbacks.class)
 public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue
     UUID uuid;
 
     @Column(unique = true)
-    @ValidUsername
     String username;
 
     @Column(unique = true)
-    @ValidEmail
     String email;
 
-    @ValidRegisterPassword
     String password;
 
-    @ValidAvatar
     String avatar;
 
-    @ValidRole
     String role;
 
     @Override
