@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,6 +45,9 @@ public class UserEntity implements UserDetails {
     String avatar;
 
     String role;
+
+    @OneToMany
+    List<NewsEntity> news;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
