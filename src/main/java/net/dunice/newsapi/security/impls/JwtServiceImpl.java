@@ -4,9 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import net.dunice.newsapi.constants.JwtFieldsConstants;
+import lombok.AllArgsConstructor;
+import net.dunice.newsapi.configurations.JwtConfiguration;
 import net.dunice.newsapi.security.JwtService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,12 +15,9 @@ import java.util.UUID;
 import javax.crypto.SecretKey;
 
 @Service
+@AllArgsConstructor
 public class JwtServiceImpl implements JwtService {
-    @Value(value = "${bearer-secret}")
-    private String signingKey;
-
-    @Value(value = "${expiration-minutes}")
-    private Integer expirationMinutes;
+    private final JwtConfiguration jwtConfiguration;
 
     @Override
     public String extractUsername(String token) {
@@ -29,7 +26,7 @@ public class JwtServiceImpl implements JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .get(JwtFieldsConstants.Fields.username, String.class);
+                .get(jwtConfiguration.getUsernameClaim(), String.class);
     }
 
     @Override
@@ -37,9 +34,9 @@ public class JwtServiceImpl implements JwtService {
         Claims claims = extractClaims(token);
 
         Boolean isNotExpired = claims.getExpiration().after(new Date());
-        Boolean validUsername = claims.get(JwtFieldsConstants.Fields.username).equals(username);
-        Boolean validRole = claims.get(JwtFieldsConstants.Fields.role).equals(role);
-        Boolean validUuid = claims.get(JwtFieldsConstants.Fields.uuid).equals(uuid.toString());
+        Boolean validUsername = claims.get(jwtConfiguration.getUsernameClaim()).equals(username);
+        Boolean validRole = claims.get(jwtConfiguration.getRoleClaim()).equals(role);
+        Boolean validUuid = claims.get(jwtConfiguration.getUuidClaim()).equals(uuid.toString());
 
         return isNotExpired && validUsername && validRole && validUuid;
     }
@@ -49,25 +46,25 @@ public class JwtServiceImpl implements JwtService {
         Calendar calendar = Calendar.getInstance();
 
         Date now = calendar.getTime();
-        calendar.add(Calendar.MINUTE, expirationMinutes);
+        calendar.add(Calendar.MINUTE, jwtConfiguration.getExpirationMinutes());
         Date expiration = calendar.getTime();
 
         Map<String, Object> claims = createClaims(username, role, uuid);
 
         return Jwts.builder()
-                .claims(claims)
                 .subject(username)
+                .claims(claims)
                 .issuedAt(now)
                 .expiration(expiration)
-                .signWith(decodeSigningKey(), Jwts.SIG.HS256)
+                .signWith(decodeSigningKey(), Jwts.SIG.HS512)
                 .compact();
     }
 
     private Map<String, Object> createClaims(String username, String role, UUID uuid) {
         return Map.of(
-                JwtFieldsConstants.Fields.username, username,
-                JwtFieldsConstants.Fields.role, role,
-                JwtFieldsConstants.Fields.uuid, uuid
+                jwtConfiguration.getUsernameClaim(), username,
+                jwtConfiguration.getRoleClaim(), role,
+                jwtConfiguration.getUuidClaim(), uuid
         );
     }
 
@@ -80,7 +77,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private SecretKey decodeSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(signingKey);
+        byte[] keyBytes = Decoders.BASE64.decode(jwtConfiguration.getBearerSecret());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

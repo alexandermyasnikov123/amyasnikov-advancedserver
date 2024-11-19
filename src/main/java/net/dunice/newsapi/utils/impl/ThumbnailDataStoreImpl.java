@@ -4,18 +4,16 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import net.coobird.thumbnailator.Thumbnails;
+import net.dunice.newsapi.configurations.UploadConfigurationProperties;
+import net.dunice.newsapi.configurations.UserConfigurationProperties;
 import net.dunice.newsapi.utils.MultipartFileDataStore;
-import net.dunice.newsapi.utils.UploadProperties;
-import net.dunice.newsapi.utils.UserProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -25,12 +23,12 @@ import java.util.Date;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
-    UploadProperties uploadProperties;
+    UploadConfigurationProperties uploadProperties;
 
-    UserProperties userProperties;
+    UserConfigurationProperties userProperties;
 
     @Override
-    public URI compressAndStore(MultipartFile file) throws IOException {
+    public String compressAndStore(MultipartFile file, String baseApiPath) throws IOException {
         Files.createDirectories(Paths.get(getOutputPath()));
 
         String fileSimpleName = new SimpleDateFormat(uploadProperties.getPattern())
@@ -41,17 +39,20 @@ public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
         File output = new File(filePath);
         saveAndCompressFileIfAbsent(file, output);
 
-        String outputUrl = ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .toUriString();
-
-        return URI.create("%s/%s/%s".formatted(outputUrl, uploadProperties.getFileProtocol(), fileSimpleName));
+        return "%s/%s/%s".formatted(baseApiPath, uploadProperties.getFileProtocol(), fileSimpleName);
     }
 
     @Override
     public Resource loadCompressedFile(String filename) throws MalformedURLException {
         String filePath = "%s/%s".formatted(getOutputPath(), filename);
         return new UrlResource(uploadProperties.getFileProtocol(), filePath);
+    }
+
+    @Override
+    public Boolean deleteFileByName(String name) {
+        String path = "%s/%s".formatted(getOutputPath(), name);
+        File file = new File(path);
+        return file.delete();
     }
 
     private String getOutputPath() {

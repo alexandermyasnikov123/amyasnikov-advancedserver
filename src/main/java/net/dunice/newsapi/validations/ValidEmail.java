@@ -3,6 +3,7 @@ package net.dunice.newsapi.validations;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import net.dunice.newsapi.constants.ValidationConstants;
@@ -17,6 +18,7 @@ import java.lang.annotation.Target;
         message = ValidationConstants.EMAIL_SIZE_NOT_VALID
 )
 @NotNull(message = ValidationConstants.USER_EMAIL_NOT_NULL)
+@NotBlank(message = ValidationConstants.USER_EMAIL_NOT_VALID)
 @Email(message = ValidationConstants.USER_EMAIL_NOT_VALID)
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE_USE, ElementType.ANNOTATION_TYPE})

@@ -29,8 +29,6 @@ public enum ErrorCodes {
 
     USER_EMAIL_NOT_NULL(8, ValidationConstants.USER_EMAIL_NOT_NULL),
 
-    USER_PASSWORD_NOT_VALID(9, ValidationConstants.USER_PASSWORD_NOT_VALID),
-
     USER_ROLE_NOT_NULL(10, ValidationConstants.USER_ROLE_NOT_NULL),
 
     NEWS_DESCRIPTION_SIZE(11, ValidationConstants.NEWS_DESCRIPTION_SIZE),
@@ -99,11 +97,7 @@ public enum ErrorCodes {
 
     HTTP_MESSAGE_NOT_READABLE_EXCEPTION(47, ValidationConstants.HTTP_MESSAGE_NOT_READABLE_EXCEPTION),
 
-    USERNAME_HAS_TO_BE_PRESENT(48, ValidationConstants.USERNAME_HAS_TO_BE_PRESENT),
-
     USER_AVATAR_NOT_VALID(49, ValidationConstants.USER_AVATAR_NOT_VALID),
-
-    USER_ROLE_NOT_VALID(50, ValidationConstants.USER_ROLE_NOT_VALID),
 
     USER_PASSWORD_NULL(51, ValidationConstants.USER_PASSWORD_NULL),
 

@@ -1,6 +1,5 @@
 databaseChangeLog:
   - preConditions:
-      -
   - changeSet:
       id: 1
       author: Alexander Myasnikov

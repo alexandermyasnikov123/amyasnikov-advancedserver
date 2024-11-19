@@ -35,15 +35,11 @@ public interface ValidationConstants {
 
     String ID_MUST_BE_POSITIVE = "ID must be grater than zero";
 
-    String USERNAME_HAS_TO_BE_PRESENT = "Username mustn't be null";
-
     String TAGS_NOT_VALID = "Tags invalid";
 
     String NEWS_IMAGE_HAS_TO_BE_PRESENT = "Image mustn't be null";
 
     String USER_WITH_THIS_EMAIL_ALREADY_EXIST = "User with this email already exists";
-
-    String USER_PASSWORD_NOT_VALID = "user password should be more than 6 symbols";
 
     String USER_AVATAR_NOT_NULL = "user avatar mustn't be null";
 
@@ -66,8 +62,6 @@ public interface ValidationConstants {
     String NEWS_TITLE_NOT_NULL = "title has to be present";
 
     String NEWS_TITLE_SIZE = "news title size not valid";
-
-    String USER_ROLE_NOT_VALID = "user role should be between 3 and 25";
 
     String USER_PASSWORD_NULL = "user password must be null";
 
