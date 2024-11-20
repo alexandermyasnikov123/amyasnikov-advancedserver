@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -72,6 +73,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = HandlerMethodValidationException.class)
     public ResponseEntity<BaseSuccessResponse> handleHandlerExceptions(HandlerMethodValidationException exception) {
         return buildErrorResponse(exception.getAllErrors().stream().map(MessageSourceResolvable::getDefaultMessage));
+    }
+
+    @ExceptionHandler(value = MissingServletRequestParameterException.class)
+    public ResponseEntity<BaseSuccessResponse> handleRequestParamsException(MissingServletRequestParameterException exception) {
+        return buildErrorResponse(Stream.of(exception.getParameterName()));
     }
 
     private ResponseEntity<BaseSuccessResponse> buildErrorResponse(Stream<String> messages) {

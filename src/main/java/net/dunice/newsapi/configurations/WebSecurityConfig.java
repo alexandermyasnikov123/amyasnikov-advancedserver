@@ -9,6 +9,7 @@ import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -38,7 +39,8 @@ public class WebSecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(customizer -> customizer
-                        .requestMatchers(endpointsConfiguration.getPermittedEndpoints()).permitAll()
+                        .requestMatchers(endpointsConfiguration.getPermittedAllEndpoints()).permitAll()
+                        .requestMatchers(HttpMethod.GET, endpointsConfiguration.getPermittedGetEndpoints()).permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(provider)

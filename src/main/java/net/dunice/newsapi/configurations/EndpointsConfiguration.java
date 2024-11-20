@@ -10,5 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "endpoints")
 public class EndpointsConfiguration {
-    private String[] permittedEndpoints;
+    private String[] permittedAllEndpoints;
+
+    private String[] permittedGetEndpoints;
 }
