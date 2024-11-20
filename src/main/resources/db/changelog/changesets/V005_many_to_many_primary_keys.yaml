@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: news_entity
+        - tableExists:
+            tableName: tag_entity
+        - tableExists:
+            tableName: news_with_tags
+      changes:
+        - addPrimaryKey:
+            tableName: news_with_tags
+            columnNames: news_id,tag_id

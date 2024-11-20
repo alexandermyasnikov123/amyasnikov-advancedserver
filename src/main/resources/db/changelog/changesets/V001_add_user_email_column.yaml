@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+          - columnExists:
+              tableName: user_entity
+              columnName: email
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    unique: true
+                  name: email
+                  type: varchar(255)
+            tableName: user_entity

@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - columnExists:
+            tableName: user_entity
+            columnName: role_name
+      changes:
+        - renameColumn:
+            newColumnName: role
+            oldColumnName: role_name
+            tableName: user_entity

@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 7
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: user_entity
+      changes:
+        - addColumn:
+            tableName: tag_entity
+            columns:
+              - column:
+                  name: title
+                  type: varchar(160)
+                  constraints:
+                    nullable: false
+                    unique: true

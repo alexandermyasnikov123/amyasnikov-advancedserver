@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: role_entity
+        - tableExists:
+            tableName: role_entity_users
+      changes:
+        - delete:
+            tableName: role_entity
+        - delete:
+            tableName: role_entity_users
