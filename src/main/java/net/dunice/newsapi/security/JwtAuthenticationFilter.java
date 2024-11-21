@@ -7,15 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import net.dunice.newsapi.services.AuthService;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
-import java.util.Optional;
-import java.util.function.Supplier;
 
 @Component
 @AllArgsConstructor
@@ -32,31 +28,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        Optional<String> jwtToken = tryExtractBearerToken(request);
-        jwtToken.ifPresent(token -> filterRequest(token, request));
-
+        tryAuthenticate(request);
         filterChain.doFilter(request, response);
     }
 
-    private Optional<String> tryExtractBearerToken(HttpServletRequest request) {
+    @SuppressWarnings("WrapperTypeMayBePrimitive")
+    private void tryAuthenticate(HttpServletRequest request) {
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-
-        Supplier<String> token = () -> authHeader.substring(BEARER_PREFIX.length());
-        Supplier<Boolean> isTokenValid = () -> service.isTokenValid(token.get());
         Boolean hasBearerToken = authHeader != null && authHeader.startsWith(BEARER_PREFIX);
 
-        return hasBearerToken && isTokenValid.get() ? Optional.of(token.get()) : Optional.empty();
-    }
+        if (!hasBearerToken || SecurityContextHolder.getContext().getAuthentication() != null) {
+            return;
+        }
 
-    private void filterRequest(String jwtToken, HttpServletRequest request) {
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            AbstractAuthenticationToken authToken = service.generateAuthToken(jwtToken);
-            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
+        String jwtToken = authHeader.substring(BEARER_PREFIX.length());
+        service.createAuthenticationTokenIfValid(jwtToken).ifPresent(authToken -> {
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authToken);
 
             SecurityContextHolder.setContext(context);
-        }
+        });
     }
 }
