@@ -1,7 +1,9 @@
 package net.dunice.newsapi.controllers;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.constants.ValidationConstants;
 import net.dunice.newsapi.dtos.requests.NewsRequest;
 import net.dunice.newsapi.dtos.responses.NewsPagingResponse;
@@ -18,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,7 +41,27 @@ public class NewsController {
     ) {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         Long id = service.createNews(request, user);
-        return ResponseEntity.ok(new CustomSuccessResponse<>(id));
+        return ResponseEntity.ok(
+                new BaseSuccessResponse(ErrorCodes.SUCCESS.getStatusCode(), null, null) {
+                    public Long getId() {
+                        return id;
+                    }
+                }
+        );
+    }
+
+    @PutMapping(value = "{id}")
+    public ResponseEntity<BaseSuccessResponse> updateNews(
+            @PathVariable
+            @NotNull(message = ValidationConstants.NEWS_ID_NULL)
+            Long id,
+            @Valid
+            @RequestBody
+            NewsRequest request,
+            Authentication authentication
+    ) {
+        service.updateNews(id, request, (UserEntity) authentication.getPrincipal());
+        return ResponseEntity.ok(BaseSuccessResponse.success());
     }
 
     @GetMapping

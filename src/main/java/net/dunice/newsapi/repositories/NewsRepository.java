@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface NewsRepository extends JpaRepository<NewsEntity, Integer> {
+public interface NewsRepository extends JpaRepository<NewsEntity, Long> {
     @Query(value = """
             FROM NewsEntity ne
             LEFT JOIN FETCH ne.user user

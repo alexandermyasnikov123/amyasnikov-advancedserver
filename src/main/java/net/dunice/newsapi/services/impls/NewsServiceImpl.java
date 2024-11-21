@@ -36,9 +36,17 @@ public class NewsServiceImpl implements NewsService {
     @Transactional
     @Override
     public Long createNews(NewsRequest request, UserEntity owner) {
-        List<TagEntity> tags = tagsService.storeTagsAndGet(request.tags());
-        NewsEntity entity = repository.save(mapper.requestToEntity(request, owner, tags));
-        return entity.getId();
+        return saveNewsAndTags(null, request, owner).getId();
+    }
+
+    @Transactional
+    @Override
+    public void updateNews(Long id, NewsRequest request, UserEntity owner) {
+        repository.findById(id).map(NewsEntity::getUser).ifPresent(user -> {
+            if (user.getUuid().equals(owner.getUuid())) {
+                saveNewsAndTags(id, request, owner);
+            }
+        });
     }
 
     @Override
@@ -81,6 +89,11 @@ public class NewsServiceImpl implements NewsService {
         );
 
         return mapPageToResponse(newsPage);
+    }
+
+    private NewsEntity saveNewsAndTags(Long id, NewsRequest request, UserEntity owner) {
+        List<TagEntity> tags = tagsService.storeTagsAndGet(request.tags());
+        return repository.save(mapper.requestToEntity(id, request, owner, tags));
     }
 
     private Pageable buildPageRequest(Integer page, Integer perPage) {
