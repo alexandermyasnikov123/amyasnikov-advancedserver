@@ -14,6 +14,7 @@ import jakarta.persistence.NamedEntityGraph;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class NewsEntity {
     List<TagEntity> tags;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_entity_id")
+    @JoinColumn(name = "user_entity_id", referencedColumnName = "uuid")
+    @ToString.Exclude
     UserEntity user;
 }
