@@ -25,4 +25,6 @@ public interface NewsService {
     Long createNews(NewsRequest request, UserEntity owner);
 
     void updateNews(Long id, NewsRequest request, UserEntity owner);
+
+    void deleteNews(Long id, UserEntity user);
 }
