@@ -1,9 +1,8 @@
 package net.dunice.newsapi.dtos.requests;
 
-import jakarta.validation.constraints.NotBlank;
-import net.dunice.newsapi.constants.ValidationConstants;
 import net.dunice.newsapi.validations.ValidDescription;
 import net.dunice.newsapi.validations.ValidNewsImage;
+import net.dunice.newsapi.validations.ValidTag;
 import net.dunice.newsapi.validations.ValidTitle;
 import java.util.List;
 
@@ -14,6 +13,6 @@ public record NewsRequest(
         String description,
         @ValidNewsImage
         String image,
-        List<@NotBlank(message = ValidationConstants.TAGS_NOT_VALID) String> tags
+        List<@ValidTag String> tags
 ) {
 }

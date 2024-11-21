@@ -50,7 +50,9 @@ public class UserController {
     @PutMapping
     public ResponseEntity<BaseSuccessResponse> updateCurrentUser(
             Authentication authentication,
-            @Valid @RequestBody UpdateUserRequest request
+            @Valid
+            @RequestBody
+            UpdateUserRequest request
     ) {
         String uuid = extractUuidFrom(authentication);
         PublicUserResponse userResponse = service.updateUser(uuid, request);

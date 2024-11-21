@@ -54,4 +54,21 @@ public class NewsController {
         ContentResponse<NewsPagingResponse> response = service.loadAllPagingNews(page, perPage);
         return ResponseEntity.ok(new CustomSuccessResponse<>(response));
     }
+
+    @GetMapping(value = "find")
+    public ResponseEntity<BaseSuccessResponse> loadPaginatedNewsBy(
+            @RequestParam
+            @Positive(message = ValidationConstants.PAGE_SIZE_NOT_VALID)
+            Integer page,
+            @RequestParam
+            @Positive(message = ValidationConstants.PER_PAGE_MIN_NOT_VALID)
+            @Max(value = NewsEntity.MAX_PER_PAGE_NEWS, message = ValidationConstants.TASKS_PER_PAGE_LESS_OR_EQUAL_100)
+            Integer perPage,
+            String author,
+            String keywords,
+            String[] tags
+    ) {
+        ContentResponse<NewsPagingResponse> response = service.findAllPagingNews(page, perPage, author, keywords, tags);
+        return ResponseEntity.ok(new CustomSuccessResponse<>(response));
+    }
 }
