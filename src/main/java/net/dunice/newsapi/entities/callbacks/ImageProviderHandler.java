@@ -1,33 +1,32 @@
 package net.dunice.newsapi.entities.callbacks;
 
-import jakarta.persistence.PostLoad;
-import jakarta.persistence.PostRemove;
-import jakarta.persistence.PostUpdate;
 import lombok.RequiredArgsConstructor;
 import net.dunice.newsapi.entities.ImageProvider;
 import net.dunice.newsapi.services.FilesService;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-public class BaseImageProviderCallbacks<T extends ImageProvider> {
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Component
+public class ImageProviderHandler {
     private final FilesService service;
 
     private volatile String previousAvatar;
 
-    @PostLoad
-    public void cachePreviousState(T currentState) {
+    public void cachePreviousState(ImageProvider currentState) {
         previousAvatar = currentState.getImageUrl();
     }
 
-    @PostRemove
-    public void deleteAvatarFile(T ignored) {
+    public void deleteCachedAvatar() {
         service.deleteFileByUrl(previousAvatar);
     }
 
-    @PostUpdate
-    public void deleteAvatarIfAbsent(T currentState) {
+    public void deleteAvatarIfAbsent(ImageProvider currentState) {
         if (currentState.getImageUrl().equals(previousAvatar)) {
             return;
         }
-        deleteAvatarFile(currentState);
+        deleteCachedAvatar();
     }
 }
