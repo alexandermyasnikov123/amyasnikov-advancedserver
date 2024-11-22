@@ -22,4 +22,6 @@ public class EndpointsConfiguration {
     private List<String> allowedOrigins;
 
     private String corsPattern;
+
+    private List<String> loggingEndpoints;
 }
