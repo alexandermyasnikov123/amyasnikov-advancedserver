@@ -1,6 +1,5 @@
 package net.dunice.newsapi.services;
 
-import jakarta.transaction.Transactional;
 import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.entities.UserEntity;
@@ -23,7 +22,6 @@ public interface UserService extends UserDetailsService {
     @Override
     UserEntity loadUserByUsername(String username);
 
-    @Transactional
     PublicUserResponse insertUser(UserEntity entity);
 
     void deleteUserByUsername(String username);
