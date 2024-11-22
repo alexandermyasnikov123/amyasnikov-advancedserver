@@ -12,7 +12,6 @@ import net.dunice.newsapi.errors.ErrorCodesException;
 import net.dunice.newsapi.mappers.UserEntityMapper;
 import net.dunice.newsapi.repositories.UsersRepository;
 import net.dunice.newsapi.services.UserService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +44,11 @@ public class UserServiceImpl implements UserService {
         return mapper.entityToPublicResponse(user);
     }
 
+    @Override
+    public UserEntity loadUserByUsername(String username) {
+        return repository.findUserEntityByUsername(username).orElseThrow(this::getUserNotFoundException);
+    }
+
     @Transactional
     @Override
     public PublicUserResponse updateUser(String uuid, UpdateUserRequest request) {
@@ -58,7 +62,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public PublicUserResponse insertUser(UserEntity entity) {
-        if (hasUserWithEmail(entity.getEmail()) || hasUserWithUsername(entity.getUsername())) {
+        String username = entity.getUsername();
+        String email = entity.getEmail();
+
+        if (hasUserWithEmail(email) || hasUserWithUsername(username)) {
             throw new ErrorCodesException(ErrorCodes.USER_ALREADY_EXISTS);
         }
 
@@ -69,22 +76,18 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void deleteUserByUsername(String username) {
+        if (!hasUserWithUsername(username)) {
+            throw getUserNotFoundException();
+        }
         repository.deleteUserEntityByUsername(username);
     }
 
-    @Override
-    public UserEntity loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findUserEntityByUsername(username).orElseThrow(this::getUserNotFoundException);
-    }
-
-    @Override
-    public Boolean hasUserWithUsername(String username) {
-        return repository.findUserEntityByUsername(username).isPresent();
-    }
-
-    @Override
-    public Boolean hasUserWithEmail(String email) {
+    private Boolean hasUserWithEmail(String email) {
         return repository.findUserEntityByEmail(email).isPresent();
+    }
+
+    private Boolean hasUserWithUsername(String username) {
+        return repository.findUserEntityByUsername(username).isPresent();
     }
 
     private RuntimeException getUserNotFoundException() {
