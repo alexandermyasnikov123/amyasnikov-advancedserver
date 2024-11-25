@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedEntityGraph;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,13 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@NamedEntityGraph(
+        name = "news_graph_join_all",
+        includeAllAttributes = true
+)
 public class NewsEntity {
+    public static final int MAX_PER_PAGE_NEWS = 100;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
