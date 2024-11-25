@@ -1,5 +1,8 @@
 package net.dunice.newsapi.services.impls;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
@@ -18,10 +21,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImplTest {
-    private final List<UserEntity> allUsers = generateUserEntities(10);
+    List<UserEntity> allUsers = generateUserEntities(10);
 
-    private final List<PublicUserResponse> publicUserResponses = allUsers.stream()
+    List<PublicUserResponse> publicUserResponses = allUsers.stream()
             .map(entity -> new PublicUserResponse(
                     entity.getAvatar(),
                     entity.getEmail(),
@@ -30,13 +34,15 @@ public class UserServiceImplTest {
                     entity.getRole()
             )).toList();
 
-    private final Optional<UserEntity> foundUser = Optional.of(allUsers.getFirst());
+    Optional<UserEntity> foundUser = Optional.of(allUsers.getFirst());
 
-    private final PublicUserResponse foundPublicUser = publicUserResponses.getFirst();
+    PublicUserResponse foundPublicUser = publicUserResponses.getFirst();
 
-    private UsersRepository repository;
+    @NonFinal
+    UsersRepository repository;
 
-    private UserServiceImpl service;
+    @NonFinal
+    UserServiceImpl service;
 
     @BeforeEach
     public void beforeEach() {

@@ -106,4 +106,6 @@ public interface ValidationConstants {
     String HTTP_MESSAGE_NOT_READABLE_EXCEPTION = "Http request not valid";
 
     String INVALID_JWT_TOKEN = "Invalid JWT token. Can't authenticate unknown user";
+
+    String EMPTY_MULTIPART_FILE = "Multipart file can't be an empty file";
 }

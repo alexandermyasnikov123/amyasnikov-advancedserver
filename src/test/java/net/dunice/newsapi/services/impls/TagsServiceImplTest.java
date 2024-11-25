@@ -1,5 +1,8 @@
 package net.dunice.newsapi.services.impls;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import net.dunice.newsapi.entities.TagEntity;
 import net.dunice.newsapi.repositories.TagsRepository;
 import org.junit.jupiter.api.Assertions;
@@ -10,16 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TagsServiceImplTest {
-    private final List<TagEntity> allTags = generateTugs(10);
+    List<TagEntity> allTags = generateTags(10);
 
-    private final List<String> allTitles = allTags.stream()
+    List<String> allTitles = allTags.stream()
             .map(TagEntity::getTitle)
             .toList();
 
-    private TagsRepository repository;
+    @NonFinal
+    TagsRepository repository;
 
-    private TagsServiceImpl service;
+    @NonFinal
+    TagsServiceImpl service;
 
     @BeforeEach
     public void beforeEach() {
@@ -28,7 +34,7 @@ public class TagsServiceImplTest {
     }
 
     @Test
-    public void storeTagsAndGetInsertAllIfNotExistsInRepo() {
+    public void storeTagsAndGet_ReturnsAllValuesIfExistsAndDoNotSaveAny() {
         Mockito.when(repository.findAllByTitleIn(Mockito.anyList())).thenReturn(allTags);
         Mockito.when(repository.saveAll(Mockito.any())).then(invocation -> Assertions.fail());
 
@@ -36,9 +42,25 @@ public class TagsServiceImplTest {
         Assertions.assertIterableEquals(allTags, actual);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    public void storeTagsAndGetInsertOnlyNonExistingTags() {
+    public void storeTagsAndGet_InsertAllTagsWhenValuesDoNotExists() {
+        AtomicBoolean saveAllWasCalled = new AtomicBoolean(false);
+
+        Mockito.when(repository.findAllByTitleIn(Mockito.anyList())).thenReturn(List.of());
+        Mockito.when(repository.saveAll(Mockito.any())).then(invocation -> {
+            saveAllWasCalled.set(true);
+            return allTags;
+        });
+
+        var actual = service.storeTagsAndGet(allTitles);
+
+        Assertions.assertTrue(saveAllWasCalled.get());
+        Assertions.assertIterableEquals(allTags, actual);
+    }
+
+    @SuppressWarnings({"unchecked", "WrapperTypeMayBePrimitive"})
+    @Test
+    public void storeTagsAndGet_InsertsOnlyNonExistingTags() {
         Integer skipAmount = 3;
         AtomicBoolean saveAllWasCalled = new AtomicBoolean(false);
 
@@ -62,7 +84,7 @@ public class TagsServiceImplTest {
         Assertions.assertTrue(saveAllWasCalled.get());
     }
 
-    private List<TagEntity> generateTugs(Integer amount) {
+    private List<TagEntity> generateTags(Integer amount) {
         List<TagEntity> result = new ArrayList<>();
         for (var i = 1L; i <= amount; ++i) {
             result.add(new TagEntity(i, "title_" + i));
