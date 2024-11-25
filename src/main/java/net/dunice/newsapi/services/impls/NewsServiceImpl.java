@@ -1,5 +1,6 @@
 package net.dunice.newsapi.services.impls;
 
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import net.dunice.newsapi.services.TagsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -40,6 +42,27 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public ContentResponse<NewsPagingResponse> loadAllPagingNews(Integer page, Integer perPage) {
         Page<NewsEntity> newsPage = repository.findAll(PageRequest.of(page - 1, perPage));
+
+        return mapPageToResponse(newsPage);
+    }
+
+    @Override
+    public ContentResponse<NewsPagingResponse> findAllPagingNews(
+            Integer page,
+            Integer perPage,
+            @Nullable String author,
+            @Nullable String keywords,
+            @Nullable String[] tags
+    ) {
+        String lowerKeywords = keywords == null ? "" : keywords.toLowerCase();
+        List<String> tagsOrNull = tags == null || tags.length < 1 ? null : Arrays.asList(tags);
+
+        Page<NewsEntity> newsPage = repository.findAllByKeywords(
+                lowerKeywords,
+                author,
+                tagsOrNull,
+                PageRequest.of(page - 1, perPage)
+        );
 
         return mapPageToResponse(newsPage);
     }

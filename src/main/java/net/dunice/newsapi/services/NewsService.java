@@ -11,4 +11,12 @@ public interface NewsService {
     Long createNews(NewsRequest request, UserEntity owner);
 
     ContentResponse<NewsPagingResponse> loadAllPagingNews(Integer page, Integer perPage);
+
+    ContentResponse<NewsPagingResponse> findAllPagingNews(
+            Integer page,
+            Integer perPage,
+            String author,
+            String keywords,
+            String[] tags
+    );
 }
