@@ -1,7 +1,7 @@
 package net.dunice.newsapi.services.impls;
 
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class FilesServiceImpl implements FilesService {
@@ -35,9 +36,12 @@ public class FilesServiceImpl implements FilesService {
     }
 
     @Override
-    @SneakyThrows
     public void deleteFileByUrl(String url) {
-        String fileName = Paths.get(url).getFileName().toString();
-        dataStore.deleteFileByName(fileName);
+        try {
+            String fileName = Paths.get(url).getFileName().toString();
+            dataStore.deleteFileByName(fileName);
+        } catch (Exception ignored) {
+            log.atError().log("Invalid avatar url was provided: " + url);
+        }
     }
 }

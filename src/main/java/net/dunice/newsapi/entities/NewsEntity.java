@@ -1,6 +1,7 @@
 package net.dunice.newsapi.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
@@ -11,10 +12,13 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import net.dunice.newsapi.entities.callbacks.NewsEntityCallbacks;
 import java.util.List;
 
 @Entity
@@ -25,7 +29,8 @@ import java.util.List;
         name = "news_graph_join_all",
         includeAllAttributes = true
 )
-public class NewsEntity {
+@EntityListeners(value = NewsEntityCallbacks.class)
+public class NewsEntity implements ImageProvider {
     public static final int MAX_PER_PAGE_NEWS = 100;
 
     @Id
@@ -49,6 +54,13 @@ public class NewsEntity {
     List<TagEntity> tags;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_entity_id")
+    @JoinColumn(name = "user_entity_id", referencedColumnName = "uuid")
+    @ToString.Exclude
     UserEntity user;
+
+    @Override
+    @Transient
+    public String getImageUrl() {
+        return getImage();
+    }
 }

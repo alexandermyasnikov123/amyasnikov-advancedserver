@@ -20,6 +20,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -31,13 +34,28 @@ public class WebSecurityConfig {
     ObjectMapper mapper;
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource(
+            EndpointsConfiguration endpointsConfiguration
+    ) {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(endpointsConfiguration.getAllowedOrigins());
+        configuration.setAllowedMethods(endpointsConfiguration.getAllowedMethods());
+        configuration.setAllowedHeaders(endpointsConfiguration.getAllowedHeaders());
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration(endpointsConfiguration.getCorsPattern(), configuration);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain getFilterChain(
             HttpSecurity http,
             JwtAuthenticationFilter filter,
-            AuthenticationProvider provider
+            AuthenticationProvider provider,
+            CorsConfigurationSource corsConfigurationSource
     ) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(c -> c.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(customizer -> customizer
                         .requestMatchers(endpointsConfiguration.getPermittedAllEndpoints()).permitAll()
                         .requestMatchers(HttpMethod.GET, endpointsConfiguration.getPermittedGetEndpoints()).permitAll()

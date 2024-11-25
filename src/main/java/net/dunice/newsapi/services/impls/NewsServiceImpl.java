@@ -5,12 +5,14 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.NewsRequest;
 import net.dunice.newsapi.dtos.responses.NewsPagingResponse;
 import net.dunice.newsapi.dtos.responses.common.ContentResponse;
 import net.dunice.newsapi.entities.NewsEntity;
 import net.dunice.newsapi.entities.TagEntity;
 import net.dunice.newsapi.entities.UserEntity;
+import net.dunice.newsapi.errors.ErrorCodesException;
 import net.dunice.newsapi.mappers.NewsMapper;
 import net.dunice.newsapi.repositories.NewsRepository;
 import net.dunice.newsapi.services.NewsService;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 @Service
 @AllArgsConstructor
@@ -42,10 +45,14 @@ public class NewsServiceImpl implements NewsService {
     @Transactional
     @Override
     public void updateNews(Long id, NewsRequest request, UserEntity owner) {
-        repository.findById(id).map(NewsEntity::getUser).ifPresent(user -> {
-            if (user.getUuid().equals(owner.getUuid())) {
-                saveNewsAndTags(id, request, owner);
-            }
+        runIfExistsOrElse(id, owner, ignored -> saveNewsAndTags(id, request, owner), () -> {
+        });
+    }
+
+    @Override
+    public void deleteNews(Long id, UserEntity owner) {
+        runIfExistsOrElse(id, owner, repository::delete, () -> {
+            throw new ErrorCodesException(ErrorCodes.NEWS_NOT_FOUND);
         });
     }
 
@@ -89,6 +96,14 @@ public class NewsServiceImpl implements NewsService {
         );
 
         return mapPageToResponse(newsPage);
+    }
+
+    private void runIfExistsOrElse(Long id, UserEntity owner, Consumer<NewsEntity> ifPresent, Runnable ifNotPresent) {
+        repository.findById(id).ifPresentOrElse(news -> {
+            if (news.getUser().getUuid().equals(owner.getUuid())) {
+                ifPresent.accept(news);
+            }
+        }, ifNotPresent);
     }
 
     private NewsEntity saveNewsAndTags(Long id, NewsRequest request, UserEntity owner) {

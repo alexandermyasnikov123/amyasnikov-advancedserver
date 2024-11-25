@@ -4,26 +4,26 @@ import jakarta.persistence.PostLoad;
 import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
 import lombok.AllArgsConstructor;
-import net.dunice.newsapi.entities.UserEntity;
+import net.dunice.newsapi.entities.NewsEntity;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class UserEntityCallbacks {
+public class NewsEntityCallbacks {
     private final ImageProviderHandler callbacks;
 
     @PostLoad
-    public void postLoad(UserEntity entity) {
+    public void postLoad(NewsEntity entity) {
         callbacks.cachePreviousState(entity);
     }
 
     @PostRemove
-    public void postRemove(UserEntity ignored) {
+    public void postRemove(NewsEntity ignored) {
         callbacks.deleteCachedAvatar();
     }
 
     @PostUpdate
-    public void postUpdate(UserEntity currentState) {
+    public void postUpdate(NewsEntity currentState) {
         callbacks.deleteAvatarIfAbsent(currentState);
     }
 }

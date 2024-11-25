@@ -7,8 +7,8 @@ import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
-import net.dunice.newsapi.entities.UserEntity;
 import net.dunice.newsapi.services.UserService;
+import net.dunice.newsapi.utils.AuthenticationUtils;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -66,6 +66,6 @@ public class UserController {
     }
 
     private String extractUuidFrom(Authentication authentication) {
-        return ((UserEntity) authentication.getPrincipal()).getUuid().toString();
+        return AuthenticationUtils.getUser(authentication).getUuid().toString();
     }
 }

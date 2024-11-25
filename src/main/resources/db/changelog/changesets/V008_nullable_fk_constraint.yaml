@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - columnExists:
+            tableName: news_entity
+            columnName: user_entity_id
+      changes:
+        - dropNotNullConstraint:
+            tableName: news_entity
+            columnName: user_entity_id

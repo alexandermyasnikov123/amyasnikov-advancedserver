@@ -3,27 +3,22 @@ package net.dunice.newsapi.services.impls;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
 import net.dunice.newsapi.dtos.responses.AuthUserResponse;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.entities.UserEntity;
-import net.dunice.newsapi.errors.ErrorCodesException;
 import net.dunice.newsapi.mappers.UserEntityMapper;
 import net.dunice.newsapi.security.JwtService;
 import net.dunice.newsapi.services.AuthService;
 import net.dunice.newsapi.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,8 +29,6 @@ public class AuthServiceImpl implements AuthService {
 
     PasswordEncoder encoder;
 
-    @NonFinal
-    @Setter(onMethod_ = {@Autowired, @Lazy})
     AuthenticationManager authenticationManager;
 
     UserEntityMapper mapper;
@@ -64,23 +57,18 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Boolean isTokenValid(String token) {
-        String username = jwtService.extractUsername(token);
+    public Optional<AbstractAuthenticationToken> createAuthenticationTokenIfValid(String jwtToken) {
+        String username = jwtService.extractUsername(jwtToken);
         UserEntity user = userService.loadUserByUsername(username);
 
-        return jwtService.isTokenValid(token, user.getUsername(), user.getRole(), user.getUuid());
-    }
+        Boolean isValid = jwtService.isTokenValid(jwtToken, user.getUsername(), user.getRole(), user.getUuid());
+        AbstractAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                user,
+                null,
+                user.getAuthorities()
+        );
 
-    @Override
-    public AbstractAuthenticationToken generateAuthToken(String token) {
-        String username = jwtService.extractUsername(token);
-        UserEntity user = userService.loadUserByUsername(username);
-
-        if (!isTokenValid(token)) {
-            throw new ErrorCodesException(ErrorCodes.INVALID_JWT_TOKEN);
-        }
-
-        return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        return isValid ? Optional.of(authToken) : Optional.empty();
     }
 
     private String generateBearerTokenHeader(String username, String role, UUID uuid) {
