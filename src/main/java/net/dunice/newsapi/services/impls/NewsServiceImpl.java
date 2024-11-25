@@ -17,9 +17,11 @@ import net.dunice.newsapi.services.NewsService;
 import net.dunice.newsapi.services.TagsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -41,7 +43,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public ContentResponse<NewsPagingResponse> loadAllPagingNews(Integer page, Integer perPage) {
-        Page<NewsEntity> newsPage = repository.findAll(PageRequest.of(page - 1, perPage));
+        Page<NewsEntity> newsPage = repository.findAll(buildPageRequest(page, perPage));
 
         return mapPageToResponse(newsPage);
     }
@@ -61,10 +63,28 @@ public class NewsServiceImpl implements NewsService {
                 lowerKeywords,
                 author,
                 tagsOrNull,
-                PageRequest.of(page - 1, perPage)
+                buildPageRequest(page, perPage)
         );
 
         return mapPageToResponse(newsPage);
+    }
+
+    @Override
+    public ContentResponse<NewsPagingResponse> findAllPagingNewsByUserUuid(
+            Integer page,
+            Integer perPage,
+            String uuid
+    ) {
+        Page<NewsEntity> newsPage = repository.findAllByUser_Uuid(
+                UUID.fromString(uuid),
+                buildPageRequest(page, perPage)
+        );
+
+        return mapPageToResponse(newsPage);
+    }
+
+    private Pageable buildPageRequest(Integer page, Integer perPage) {
+        return PageRequest.of(page - 1, perPage);
     }
 
     private ContentResponse<NewsPagingResponse> mapPageToResponse(Page<? extends NewsEntity> newsPage) {

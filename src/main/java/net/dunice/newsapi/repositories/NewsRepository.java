@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface NewsRepository extends JpaRepository<NewsEntity, Integer> {
@@ -29,4 +30,7 @@ public interface NewsRepository extends JpaRepository<NewsEntity, Integer> {
     @NonNull
     @EntityGraph(value = "news_graph_join_all", type = EntityGraph.EntityGraphType.FETCH)
     Page<NewsEntity> findAll(@NonNull Pageable pageable);
+
+    @EntityGraph(value = "news_graph_join_all", type = EntityGraph.EntityGraphType.FETCH)
+    Page<NewsEntity> findAllByUser_Uuid(UUID uuid, Pageable pageable);
 }
