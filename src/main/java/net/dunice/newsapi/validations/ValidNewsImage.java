@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Size(
         min = ValidNewsImage.MIN_IMAGE_LENGTH,
         max = ValidNewsImage.MAX_IMAGE_LENGTH,
-        message = ValidationConstants.NEWS_IMAGE_LENGTH
+        message = ValidationConstants.NEWS_IMAGE_HAS_TO_BE_PRESENT
 )
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})

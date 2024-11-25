@@ -13,10 +13,10 @@ import java.util.List;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface NewsMapper {
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "id", source = "id")
     @Mapping(target = "user", source = "user")
     @Mapping(target = "tags", source = "tags")
-    NewsEntity requestToEntity(NewsRequest request, UserEntity user, List<TagEntity> tags);
+    NewsEntity requestToEntity(Long id, NewsRequest request, UserEntity user, List<TagEntity> tags);
 
     @Mapping(target = "username", expression = "java(entity.getUser().getUsername())")
     @Mapping(target = "userId", expression = "java(entity.getUser().getUuid())")
