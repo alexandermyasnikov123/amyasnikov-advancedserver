@@ -1,4 +1,4 @@
-package net.dunice.newsapi.dtos.responses.common;
+package net.dunice.newsapi.dtos.responses;
 
 import java.util.List;
 

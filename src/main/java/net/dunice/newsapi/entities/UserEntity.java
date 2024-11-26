@@ -16,7 +16,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import lombok.experimental.FieldDefaults;
-import net.dunice.newsapi.entities.callbacks.UserEntityCallbacks;
+import net.dunice.newsapi.entities.callbacks.ImageDeleteCallbacks;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +31,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@EntityListeners(value = UserEntityCallbacks.class)
+@EntityListeners(value = ImageDeleteCallbacks.class)
 public class UserEntity implements UserDetails, ImageProvider {
     @Id
     @GeneratedValue

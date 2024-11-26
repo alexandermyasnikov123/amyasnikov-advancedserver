@@ -45,15 +45,21 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(
-            EndpointsConfiguration endpointsConfiguration
-    ) {
+    public CorsConfiguration getCorsConfiguration(EndpointsConfiguration endpointsConfiguration) {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(endpointsConfiguration.getAllowedOrigins());
         configuration.setAllowedMethods(endpointsConfiguration.getAllowedMethods());
         configuration.setAllowedHeaders(endpointsConfiguration.getAllowedHeaders());
+        return configuration;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(
+            EndpointsConfiguration endpointsConfiguration,
+            CorsConfiguration corsConfiguration
+    ) {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration(endpointsConfiguration.getCorsPattern(), configuration);
+        source.registerCorsConfiguration(endpointsConfiguration.getCorsPattern(), corsConfiguration);
         return source;
     }
 
@@ -66,7 +72,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     ) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(c -> c.configurationSource(corsConfigurationSource))
+                .cors(configurer -> configurer.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(customizer -> customizer
                         .requestMatchers(endpointsConfiguration.getPermittedAllEndpoints()).permitAll()
                         .requestMatchers(HttpMethod.GET, endpointsConfiguration.getPermittedGetEndpoints()).permitAll()
