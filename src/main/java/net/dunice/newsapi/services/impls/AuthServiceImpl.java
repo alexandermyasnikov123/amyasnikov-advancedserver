@@ -39,7 +39,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthUserResponse registerUser(RegisterRequest request) {
         PublicUserResponse response = userService.insertUser(mapper.registerRequestToEntity(request, encoder));
-        String token = generateBearerTokenHeader(response.name(), response.role(), UUID.fromString(response.id()));
+        String token = jwtService.generateTokenWithHeader(
+                response.name(),
+                response.role(),
+                UUID.fromString(response.id())
+        );
 
         return mapper.publicResponseToAuth(response, token);
     }
@@ -47,7 +51,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthUserResponse loginUser(LoginRequest request) {
         PublicUserResponse response = userService.loadByEmail(request.email());
-        String token = generateBearerTokenHeader(response.name(), response.role(), UUID.fromString(response.id()));
+        String token = jwtService.generateTokenWithHeader(
+                response.name(),
+                response.role(),
+                UUID.fromString(response.id())
+        );
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(response.name(), request.password())
@@ -69,10 +77,5 @@ public class AuthServiceImpl implements AuthService {
         );
 
         return isValid ? Optional.of(authToken) : Optional.empty();
-    }
-
-    private String generateBearerTokenHeader(String username, String role, UUID uuid) {
-        String bearerPrefix = "Bearer ";
-        return bearerPrefix + jwtService.generateToken(username, role, uuid);
     }
 }

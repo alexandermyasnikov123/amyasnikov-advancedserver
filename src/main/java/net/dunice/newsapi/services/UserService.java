@@ -13,14 +13,10 @@ public interface UserService extends UserDetailsService {
 
     PublicUserResponse loadByEmail(String email);
 
-    PublicUserResponse updateUser(String uuid, UpdateUserRequest request);
-
-    Boolean hasUserWithUsername(String username);
-
-    Boolean hasUserWithEmail(String email);
-
     @Override
     UserEntity loadUserByUsername(String username);
+
+    PublicUserResponse updateUser(String uuid, UpdateUserRequest request);
 
     PublicUserResponse insertUser(UserEntity entity);
 

@@ -30,7 +30,9 @@ public class TagsServiceImpl implements TagsService {
                 .map(title -> TagEntity.builder().title(title).build())
                 .toList();
 
-        resultingTags.addAll(repository.saveAll(nonExistingTags));
+        if (!nonExistingTags.isEmpty()) {
+            resultingTags.addAll(repository.saveAll(nonExistingTags));
+        }
 
         return resultingTags;
     }

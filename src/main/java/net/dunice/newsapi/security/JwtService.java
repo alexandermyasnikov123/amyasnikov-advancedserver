@@ -8,4 +8,6 @@ public interface JwtService {
     Boolean isTokenValid(String token, String username, String role, UUID uuid);
 
     String generateToken(String username, String role, UUID uuid);
+
+    String generateTokenWithHeader(String username, String role, UUID uuid);
 }

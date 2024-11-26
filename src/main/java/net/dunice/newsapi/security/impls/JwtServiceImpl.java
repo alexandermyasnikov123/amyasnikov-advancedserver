@@ -60,6 +60,12 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
+    @Override
+    public String generateTokenWithHeader(String username, String role, UUID uuid) {
+        String bearerPrefix = "Bearer ";
+        return bearerPrefix + generateToken(username, role, uuid);
+    }
+
     private Map<String, Object> createClaims(String username, String role, UUID uuid) {
         return Map.of(
                 jwtConfiguration.getUsernameClaim(), username,

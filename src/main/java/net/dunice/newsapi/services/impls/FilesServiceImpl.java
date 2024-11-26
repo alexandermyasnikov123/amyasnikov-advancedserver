@@ -23,7 +23,7 @@ public class FilesServiceImpl implements FilesService {
     @Override
     public BaseSuccessResponse storeFile(MultipartFile file, String baseApiPath) throws Exception {
         if (file.isEmpty()) {
-            throw new ErrorCodesException(ErrorCodes.USER_AVATAR_NOT_VALID);
+            throw new ErrorCodesException(ErrorCodes.EMPTY_MULTIPART_FILE);
         }
 
         String resultingPathUrl = dataStore.compressAndStore(file, baseApiPath);
