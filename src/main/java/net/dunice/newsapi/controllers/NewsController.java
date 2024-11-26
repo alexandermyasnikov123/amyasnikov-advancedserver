@@ -106,7 +106,7 @@ public class NewsController {
         return ResponseEntity.ok(new CustomSuccessResponse<>(response));
     }
 
-    @GetMapping(value = "{userId}")
+    @GetMapping(value = "user/{userId}")
     public ResponseEntity<BaseSuccessResponse> loadSpecificNews(
             @PathVariable
             @UUID(message = ValidationConstants.MAX_UPLOAD_SIZE_EXCEEDED)
