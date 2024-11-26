@@ -99,6 +99,8 @@ public enum ErrorCodes {
 
     EMPTY_MULTIPART_FILE(49, ValidationConstants.EMPTY_MULTIPART_FILE),
 
+    USER_AVATAR_NOT_VALID(50, ValidationConstants.USER_AVATAR_NOT_VALID),
+
     USER_PASSWORD_NULL(51, ValidationConstants.USER_PASSWORD_NULL),
 
     USER_ID_NULL(52, ValidationConstants.USER_ID_NULL),

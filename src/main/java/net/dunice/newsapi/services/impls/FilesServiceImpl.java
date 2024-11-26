@@ -37,11 +37,7 @@ public class FilesServiceImpl implements FilesService {
 
     @Override
     public void deleteFileByUrl(String url) {
-        try {
-            String fileName = Paths.get(url).getFileName().toString();
-            dataStore.deleteFileByName(fileName);
-        } catch (Exception ignored) {
-            log.atError().log("Invalid avatar url was provided: " + url);
-        }
+        String fileName = Paths.get(url).getFileName().toString();
+        dataStore.deleteFileByName(fileName);
     }
 }

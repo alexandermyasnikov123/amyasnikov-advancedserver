@@ -1,8 +1,8 @@
 package net.dunice.newsapi.services;
 
 import net.dunice.newsapi.dtos.requests.NewsRequest;
+import net.dunice.newsapi.dtos.responses.ContentResponse;
 import net.dunice.newsapi.dtos.responses.NewsPagingResponse;
-import net.dunice.newsapi.dtos.responses.common.ContentResponse;
 import net.dunice.newsapi.entities.UserEntity;
 
 public interface NewsService {

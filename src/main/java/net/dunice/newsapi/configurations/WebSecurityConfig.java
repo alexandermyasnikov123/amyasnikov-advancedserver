@@ -16,7 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -27,6 +27,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -45,15 +47,22 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(
-            EndpointsConfiguration endpointsConfiguration
-    ) {
+    public CorsConfiguration getCorsConfiguration(EndpointsConfiguration endpointsConfiguration) {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(endpointsConfiguration.getAllowedOrigins());
         configuration.setAllowedMethods(endpointsConfiguration.getAllowedMethods());
         configuration.setAllowedHeaders(endpointsConfiguration.getAllowedHeaders());
+        configuration.setAllowCredentials(true);
+        return configuration;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(
+            EndpointsConfiguration endpointsConfiguration,
+            CorsConfiguration corsConfiguration
+    ) {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration(endpointsConfiguration.getCorsPattern(), configuration);
+        source.registerCorsConfiguration(endpointsConfiguration.getCorsPattern(), corsConfiguration);
         return source;
     }
 
@@ -65,9 +74,12 @@ public class WebSecurityConfig implements WebMvcConfigurer {
             CorsConfigurationSource corsConfigurationSource
     ) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(c -> c.configurationSource(corsConfigurationSource))
+                .headers(configurer -> configurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+                .csrf(configurer -> configurer.ignoringRequestMatchers(toH2Console()).disable())
+                .cors(c -> c
+                        .configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(customizer -> customizer
+                        .requestMatchers(toH2Console()).permitAll()
                         .requestMatchers(endpointsConfiguration.getPermittedAllEndpoints()).permitAll()
                         .requestMatchers(HttpMethod.GET, endpointsConfiguration.getPermittedGetEndpoints()).permitAll()
                         .anyRequest().authenticated()

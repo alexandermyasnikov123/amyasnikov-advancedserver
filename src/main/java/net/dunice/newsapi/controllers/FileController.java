@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.MalformedURLException;
-import java.net.URI;
 
 @RestController
 @RequestMapping(value = "file")
@@ -28,11 +27,10 @@ public class FileController {
 
     @GetMapping(value = "{path}")
     public ResponseEntity<Resource> loadFileByPath(@PathVariable String path) throws MalformedURLException {
-        URI uri = URI.create(path);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA_VALUE)
-                .body(service.loadFile(uri.getPath()));
+                .body(service.loadFile(path));
     }
 
     @PostMapping(value = "uploadFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

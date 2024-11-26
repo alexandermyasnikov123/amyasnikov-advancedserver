@@ -18,7 +18,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import net.dunice.newsapi.entities.callbacks.NewsEntityCallbacks;
+import net.dunice.newsapi.entities.callbacks.ImageDeleteCallbacks;
 import java.util.List;
 
 @Entity
@@ -29,7 +29,7 @@ import java.util.List;
         name = "news_graph_join_all",
         includeAllAttributes = true
 )
-@EntityListeners(value = NewsEntityCallbacks.class)
+@EntityListeners(value = ImageDeleteCallbacks.class)
 public class NewsEntity implements ImageProvider {
     public static final int MAX_PER_PAGE_NEWS = 100;
 

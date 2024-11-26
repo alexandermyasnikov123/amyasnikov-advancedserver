@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.constants.ValidationConstants;
 import net.dunice.newsapi.dtos.requests.NewsRequest;
+import net.dunice.newsapi.dtos.responses.ContentResponse;
 import net.dunice.newsapi.dtos.responses.NewsPagingResponse;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
-import net.dunice.newsapi.dtos.responses.common.ContentResponse;
 import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
 import net.dunice.newsapi.entities.UserEntity;
 import net.dunice.newsapi.services.NewsService;
@@ -106,7 +106,7 @@ public class NewsController {
         return ResponseEntity.ok(new CustomSuccessResponse<>(response));
     }
 
-    @GetMapping(value = "{userId}")
+    @GetMapping(value = "user/{userId}")
     public ResponseEntity<BaseSuccessResponse> loadSpecificNews(
             @PathVariable
             @UUID(message = ValidationConstants.MAX_UPLOAD_SIZE_EXCEEDED)
