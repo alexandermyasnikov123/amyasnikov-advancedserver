@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: 9
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+          - tableExists:
+              tableName: logs
+      changes:
+        - createTable:
+            tableName: logs
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: level
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: logger
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: message
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+            indexes:
+              - index:
+                  name: idx_message
+                  column: message
