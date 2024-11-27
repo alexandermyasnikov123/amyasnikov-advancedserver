@@ -13,12 +13,10 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedEntityGraph;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.FieldDefaults;
 import net.dunice.newsapi.entities.callbacks.ImageDeleteCallbacks;
 import java.util.List;
 
@@ -26,7 +24,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @NamedEntityGraph(
         name = "news_graph_join_all",
         includeAllAttributes = true
@@ -35,13 +32,13 @@ import java.util.List;
 public class NewsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    String title;
+    private String title;
 
-    String description;
+    private String description;
 
-    String image;
+    private String image;
 
     @ManyToMany
     @JoinTable(
@@ -51,11 +48,11 @@ public class NewsEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id"),
             inverseForeignKey = @ForeignKey(name = "nwt_tags_fk")
     )
-    List<TagEntity> tags;
+    private List<TagEntity> tags;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_entity_id", referencedColumnName = "uuid")
     @ToString.Exclude
     @JsonUnwrapped
-    UserEntity author;
+    private UserEntity author;
 }

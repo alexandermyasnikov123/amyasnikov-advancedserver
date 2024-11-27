@@ -4,6 +4,7 @@ import net.dunice.newsapi.dtos.requests.NewsRequest;
 import net.dunice.newsapi.dtos.responses.ContentResponse;
 import net.dunice.newsapi.entities.NewsEntity;
 import org.springframework.security.core.Authentication;
+import java.util.List;
 
 public interface NewsService {
     ContentResponse<NewsEntity> loadAllPagingNews(Integer page, Integer perPage);
@@ -13,7 +14,7 @@ public interface NewsService {
             Integer perPage,
             String author,
             String keywords,
-            String[] tags
+            List<String> tags
     );
 
     ContentResponse<NewsEntity> findAllPagingNewsByUserUuid(

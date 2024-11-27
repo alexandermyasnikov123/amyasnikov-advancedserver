@@ -1,9 +1,7 @@
 package net.dunice.newsapi.services.impls;
 
 import jakarta.annotation.Nullable;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.NewsRequest;
 import net.dunice.newsapi.dtos.responses.ContentResponse;
@@ -21,20 +19,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class NewsServiceImpl implements NewsService {
-    NewsRepository repository;
+    private final NewsRepository repository;
 
-    TagsService tagsService;
+    private final TagsService tagsService;
 
-    NewsMapper mapper;
+    private final NewsMapper mapper;
 
     @Override
     public Long createNews(NewsRequest request, Authentication authentication) {
@@ -70,10 +66,10 @@ public class NewsServiceImpl implements NewsService {
             Integer perPage,
             @Nullable String author,
             @Nullable String keywords,
-            @Nullable String[] tags
+            @Nullable List<String> tags
     ) {
         String lowerKeywords = keywords == null ? "" : keywords.toLowerCase();
-        List<String> tagsOrNull = tags == null || tags.length < 1 ? null : Arrays.asList(tags);
+        List<String> tagsOrNull = tags == null || tags.isEmpty() ? null : tags;
 
         Page<NewsEntity> newsPage = repository.findAllByKeywords(
                 lowerKeywords,

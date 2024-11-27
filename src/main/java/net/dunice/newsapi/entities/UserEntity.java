@@ -10,13 +10,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
-import lombok.experimental.FieldDefaults;
 import net.dunice.newsapi.entities.callbacks.ImageDeleteCallbacks;
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +25,6 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @EntityListeners(value = ImageDeleteCallbacks.class)
 @JsonIncludeProperties(value = {"userId", "username"})
 public class UserEntity {
@@ -35,22 +32,22 @@ public class UserEntity {
     @Column(name = "uuid")
     @GeneratedValue
     @JsonProperty(value = "userId", required = true)
-    UUID id;
+    private UUID id;
 
     @Column(unique = true)
     @JsonProperty(value = "username", required = true)
-    String username;
+    private String username;
 
     @Column(unique = true)
-    String email;
+    private String email;
 
-    String password;
+    private String password;
 
-    String avatar;
+    private String avatar;
 
-    String role;
+    private String role;
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_entity_id", referencedColumnName = "uuid")
-    List<NewsEntity> news;
+    private List<NewsEntity> news;
 }

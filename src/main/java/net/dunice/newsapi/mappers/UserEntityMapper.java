@@ -18,7 +18,6 @@ public interface UserEntityMapper {
     @Mapping(target = "username", expression = "java(request.name())")
     UserEntity registerRequestToEntity(RegisterRequest request);
 
-    @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "name", expression = "java(entity.getUsername())")
     PublicUserResponse entityToPublicResponse(UserEntity entity);
 

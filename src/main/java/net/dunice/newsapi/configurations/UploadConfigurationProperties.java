@@ -1,9 +1,7 @@
 package net.dunice.newsapi.configurations;
 
-import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,17 +9,16 @@ import org.springframework.context.annotation.Configuration;
 @NoArgsConstructor
 @Configuration
 @ConfigurationProperties(prefix = "upload")
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadConfigurationProperties {
-    String pattern;
+    private String pattern;
 
-    String dir;
+    private String dir;
 
-    String fileProtocol;
+    private String fileProtocol;
 
-    String imageExtension;
+    private String imageExtension;
 
-    Double scaleFactor;
+    private Double scaleFactor;
 
-    Integer maxAvailableSizeBytes;
+    private Integer maxAvailableSizeBytes;
 }

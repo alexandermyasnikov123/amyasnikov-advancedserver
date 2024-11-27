@@ -5,10 +5,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import net.dunice.newsapi.constants.NewsValidationConstraints;
-import net.dunice.newsapi.constants.UserValidationConstraints;
 import net.dunice.newsapi.constants.ValidationMessages;
 import net.dunice.newsapi.dtos.requests.NewsRequest;
 import net.dunice.newsapi.dtos.responses.ContentResponse;
@@ -103,12 +101,6 @@ public class NewsController {
             )
             Integer perPage,
             @RequestParam(required = false)
-            @NotBlank(message = ValidationMessages.USER_NAME_HAS_TO_BE_PRESENT)
-            @Size(
-                    min = UserValidationConstraints.MIN_USERNAME_LENGTH,
-                    max = UserValidationConstraints.MAX_USERNAME_LENGTH,
-                    message = ValidationMessages.USERNAME_SIZE_NOT_VALID
-            )
             String author,
             @RequestParam(required = false)
             String keywords,
@@ -119,7 +111,7 @@ public class NewsController {
                 perPage,
                 author,
                 keywords,
-                tags.toArray(String[]::new)
+                tags
         );
         return ResponseEntity.ok(new CustomSuccessResponse<>(response));
     }

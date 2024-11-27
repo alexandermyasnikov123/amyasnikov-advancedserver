@@ -1,9 +1,7 @@
 package net.dunice.newsapi.services.impls;
 
 import jakarta.transaction.Transactional;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
@@ -19,12 +17,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    UsersRepository repository;
+    private final UsersRepository repository;
 
-    UserEntityMapper mapper;
+    private final UserEntityMapper mapper;
 
     @Override
     public List<PublicUserResponse> loadAllUsers() {
