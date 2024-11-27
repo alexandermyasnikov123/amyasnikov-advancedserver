@@ -10,7 +10,6 @@ import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
 import net.dunice.newsapi.services.UserService;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,25 +40,24 @@ public class UserController {
     }
 
     @GetMapping(value = "info")
-    public ResponseEntity<BaseSuccessResponse> loadCurrentUserInfo(Authentication authentication) {
-        PublicUserResponse userResponse = service.loadCurrentUser(authentication);
+    public ResponseEntity<BaseSuccessResponse> loadCurrentUserInfo() {
+        PublicUserResponse userResponse = service.loadCurrentUser();
         return ResponseEntity.ok(new CustomSuccessResponse<>(userResponse));
     }
 
     @PutMapping
     public ResponseEntity<BaseSuccessResponse> updateCurrentUser(
-            Authentication authentication,
             @Valid
             @RequestBody
             UpdateUserRequest request
     ) {
-        PublicUserResponse userResponse = service.updateUser(authentication, request);
+        PublicUserResponse userResponse = service.updateUser(request);
         return ResponseEntity.ok(new CustomSuccessResponse<>(userResponse));
     }
 
     @DeleteMapping
-    public ResponseEntity<BaseSuccessResponse> deleteCurrentUser(Authentication authentication) {
-        service.deleteUser(authentication);
+    public ResponseEntity<BaseSuccessResponse> deleteCurrentUser() {
+        service.deleteUser();
         return ResponseEntity.ok(new BaseSuccessResponse());
     }
 }

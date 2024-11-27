@@ -3,7 +3,6 @@ package net.dunice.newsapi.services;
 import net.dunice.newsapi.dtos.requests.NewsRequest;
 import net.dunice.newsapi.dtos.responses.ContentResponse;
 import net.dunice.newsapi.entities.NewsEntity;
-import org.springframework.security.core.Authentication;
 import java.util.List;
 
 public interface NewsService {
@@ -23,9 +22,9 @@ public interface NewsService {
             String uuid
     );
 
-    Long createNews(NewsRequest request, Authentication authentication);
+    Long createNews(NewsRequest request);
 
-    void updateNews(Long id, NewsRequest request, Authentication authentication);
+    void updateNews(Long id, NewsRequest request);
 
-    void deleteNews(Long id, Authentication authentication);
+    void deleteNews(Long id);
 }

@@ -16,7 +16,6 @@ import net.dunice.newsapi.entities.NewsEntity;
 import net.dunice.newsapi.services.NewsService;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,10 +37,9 @@ public class NewsController {
     public ResponseEntity<BaseSuccessResponse> createNews(
             @Valid
             @RequestBody
-            NewsRequest request,
-            Authentication authentication
+            NewsRequest request
     ) {
-        Long id = service.createNews(request, authentication);
+        Long id = service.createNews(request);
         return ResponseEntity.ok(new BaseSuccessResponse().addPayload("id", id));
     }
 
@@ -53,10 +51,9 @@ public class NewsController {
             Long id,
             @Valid
             @RequestBody
-            NewsRequest request,
-            Authentication authentication
+            NewsRequest request
     ) {
-        service.updateNews(id, request, authentication);
+        service.updateNews(id, request);
         return ResponseEntity.ok(new BaseSuccessResponse());
     }
 
@@ -64,10 +61,9 @@ public class NewsController {
     public ResponseEntity<BaseSuccessResponse> deleteNews(
             @PathVariable
             @NotNull(message = ValidationMessages.NEWS_ID_NULL)
-            Long id,
-            Authentication authentication
+            Long id
     ) {
-        service.deleteNews(id, authentication);
+        service.deleteNews(id);
         return ResponseEntity.ok(new BaseSuccessResponse());
     }
 

@@ -1,6 +1,5 @@
 package net.dunice.newsapi.services.impls;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
@@ -11,7 +10,6 @@ import net.dunice.newsapi.mappers.UserEntityMapper;
 import net.dunice.newsapi.repositories.UsersRepository;
 import net.dunice.newsapi.services.UserService;
 import net.dunice.newsapi.utils.AuthenticationUtils;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
@@ -40,8 +38,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PublicUserResponse loadCurrentUser(Authentication authentication) {
-        return mapper.entityToPublicResponse(AuthenticationUtils.getUser(authentication));
+    public PublicUserResponse loadCurrentUser() {
+        return mapper.entityToPublicResponse(AuthenticationUtils.getCurrentUser());
     }
 
     @Override
@@ -54,8 +52,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PublicUserResponse updateUser(Authentication authentication, UpdateUserRequest request) {
-        UserEntity original = AuthenticationUtils.getUser(authentication);
+    public PublicUserResponse updateUser(UpdateUserRequest request) {
+        UserEntity original = AuthenticationUtils.getCurrentUser();
         UserEntity entity = mapper.updateRequestToEntity(original.getId(), original.getPassword(), request);
         repository.save(entity);
 
@@ -76,10 +74,9 @@ public class UserServiceImpl implements UserService {
         return mapper.entityToPublicResponse(result);
     }
 
-    @Transactional
     @Override
-    public void deleteUser(Authentication authentication) {
-        UserEntity user = AuthenticationUtils.getUser(authentication);
+    public void deleteUser() {
+        UserEntity user = AuthenticationUtils.getCurrentUser();
         UUID userId = user.getId();
 
         if (repository.findById(userId).isEmpty()) {
