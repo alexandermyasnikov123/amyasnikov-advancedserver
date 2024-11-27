@@ -1,10 +1,10 @@
 package net.dunice.newsapi.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
+import net.dunice.newsapi.constants.AuthDefaults;
+import net.dunice.newsapi.constants.CorsDefaults;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.security.JwtAuthenticationFilter;
@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -27,42 +28,41 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import java.util.List;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
-@AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig implements WebMvcConfigurer {
-    EndpointsConfiguration endpointsConfiguration;
+    private static final List<String> LOGGING_ENDPOINTS = List.of("/**");
 
-    ObjectMapper mapper;
+    private final ObjectMapper mapper;
 
-    HandlerInterceptor loggerInterceptor;
+    private final HandlerInterceptor loggerInterceptor;
 
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
-        registry.addInterceptor(loggerInterceptor).addPathPatterns(endpointsConfiguration.getLoggingEndpoints());
+        registry.addInterceptor(loggerInterceptor).addPathPatterns(LOGGING_ENDPOINTS);
     }
 
     @Bean
-    public CorsConfiguration getCorsConfiguration(EndpointsConfiguration endpointsConfiguration) {
+    public CorsConfiguration getCorsConfiguration() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(endpointsConfiguration.getAllowedOrigins());
-        configuration.setAllowedMethods(endpointsConfiguration.getAllowedMethods());
-        configuration.setAllowedHeaders(endpointsConfiguration.getAllowedHeaders());
+        configuration.setAllowedOrigins(CorsDefaults.ALLOWED_ORIGINS);
+        configuration.setAllowedMethods(CorsDefaults.ALLOWED_METHODS);
+        configuration.setAllowedHeaders(CorsDefaults.ALLOWED_HEADERS);
         configuration.setAllowCredentials(true);
         return configuration;
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
-            EndpointsConfiguration endpointsConfiguration,
             CorsConfiguration corsConfiguration
     ) {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration(endpointsConfiguration.getCorsPattern(), corsConfiguration);
+        source.registerCorsConfiguration(CorsDefaults.PATTERN, corsConfiguration);
         return source;
     }
 
@@ -74,14 +74,15 @@ public class WebSecurityConfig implements WebMvcConfigurer {
             CorsConfigurationSource corsConfigurationSource
     ) throws Exception {
         return http
+                .formLogin(FormLoginConfigurer::disable)
                 .headers(configurer -> configurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .csrf(configurer -> configurer.ignoringRequestMatchers(toH2Console()).disable())
                 .cors(c -> c
                         .configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(customizer -> customizer
                         .requestMatchers(toH2Console()).permitAll()
-                        .requestMatchers(endpointsConfiguration.getPermittedAllEndpoints()).permitAll()
-                        .requestMatchers(HttpMethod.GET, endpointsConfiguration.getPermittedGetEndpoints()).permitAll()
+                        .requestMatchers(AuthDefaults.FULL_PERMITTED_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, AuthDefaults.PERMITTED_GET_ENDPOINTS).permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(provider)
@@ -95,8 +96,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         return (request, response, exception) -> {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            String json = mapper.writeValueAsString(BaseSuccessResponse.error(ErrorCodes.UNAUTHORISED.getStatusCode()));
+            String json = mapper.writeValueAsString(new BaseSuccessResponse(ErrorCodes.UNAUTHORISED.getStatusCode()));
             response.getWriter().write(json);
         };
     }
 }
+

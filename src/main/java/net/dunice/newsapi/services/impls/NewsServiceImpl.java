@@ -1,14 +1,12 @@
 package net.dunice.newsapi.services.impls;
 
 import jakarta.annotation.Nullable;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.NewsRequest;
 import net.dunice.newsapi.dtos.responses.ContentResponse;
-import net.dunice.newsapi.dtos.responses.NewsPagingResponse;
 import net.dunice.newsapi.entities.NewsEntity;
 import net.dunice.newsapi.entities.TagEntity;
 import net.dunice.newsapi.entities.UserEntity;
@@ -17,9 +15,11 @@ import net.dunice.newsapi.mappers.NewsMapper;
 import net.dunice.newsapi.repositories.NewsRepository;
 import net.dunice.newsapi.services.NewsService;
 import net.dunice.newsapi.services.TagsService;
+import net.dunice.newsapi.utils.AuthenticationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class NewsServiceImpl implements NewsService {
     NewsRepository repository;
@@ -36,35 +36,36 @@ public class NewsServiceImpl implements NewsService {
 
     NewsMapper mapper;
 
-    @Transactional
     @Override
-    public Long createNews(NewsRequest request, UserEntity owner) {
+    public Long createNews(NewsRequest request, Authentication authentication) {
+        UserEntity owner = AuthenticationUtils.getUser(authentication);
         return saveNewsAndTags(null, request, owner).getId();
     }
 
-    @Transactional
     @Override
-    public void updateNews(Long id, NewsRequest request, UserEntity owner) {
+    public void updateNews(Long id, NewsRequest request, Authentication authentication) {
+        UserEntity owner = AuthenticationUtils.getUser(authentication);
         runIfExistsOrElse(id, owner, ignored -> saveNewsAndTags(id, request, owner), () -> {
         });
     }
 
     @Override
-    public void deleteNews(Long id, UserEntity owner) {
+    public void deleteNews(Long id, Authentication authentication) {
+        UserEntity owner = AuthenticationUtils.getUser(authentication);
         runIfExistsOrElse(id, owner, repository::delete, () -> {
             throw new ErrorCodesException(ErrorCodes.NEWS_NOT_FOUND);
         });
     }
 
     @Override
-    public ContentResponse<NewsPagingResponse> loadAllPagingNews(Integer page, Integer perPage) {
+    public ContentResponse<NewsEntity> loadAllPagingNews(Integer page, Integer perPage) {
         Page<NewsEntity> newsPage = repository.findAll(buildPageRequest(page, perPage));
 
         return mapPageToResponse(newsPage);
     }
 
     @Override
-    public ContentResponse<NewsPagingResponse> findAllPagingNews(
+    public ContentResponse<NewsEntity> findAllPagingNews(
             Integer page,
             Integer perPage,
             @Nullable String author,
@@ -85,12 +86,12 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public ContentResponse<NewsPagingResponse> findAllPagingNewsByUserUuid(
+    public ContentResponse<NewsEntity> findAllPagingNewsByUserUuid(
             Integer page,
             Integer perPage,
             String uuid
     ) {
-        Page<NewsEntity> newsPage = repository.findAllByUser_Uuid(
+        Page<NewsEntity> newsPage = repository.findAllByAuthor_Id(
                 UUID.fromString(uuid),
                 buildPageRequest(page, perPage)
         );
@@ -100,7 +101,7 @@ public class NewsServiceImpl implements NewsService {
 
     private void runIfExistsOrElse(Long id, UserEntity owner, Consumer<NewsEntity> ifPresent, Runnable ifNotPresent) {
         repository.findById(id).ifPresentOrElse(news -> {
-            if (news.getUser().getUuid().equals(owner.getUuid())) {
+            if (news.getAuthor().getId().equals(owner.getId())) {
                 ifPresent.accept(news);
             }
         }, ifNotPresent);
@@ -108,18 +109,20 @@ public class NewsServiceImpl implements NewsService {
 
     private NewsEntity saveNewsAndTags(Long id, NewsRequest request, UserEntity owner) {
         List<TagEntity> tags = tagsService.storeTagsAndGet(request.tags());
-        return repository.save(mapper.requestToEntity(id, request, owner, tags));
+        return repository.save(
+                mapper.requestToEntity(id, request)
+                        .setTags(tags)
+                        .setAuthor(owner)
+        );
     }
 
     private Pageable buildPageRequest(Integer page, Integer perPage) {
         return PageRequest.of(page - 1, perPage);
     }
 
-    private ContentResponse<NewsPagingResponse> mapPageToResponse(Page<? extends NewsEntity> newsPage) {
+    private ContentResponse<NewsEntity> mapPageToResponse(Page<NewsEntity> newsPage) {
         Long numberOfElements = newsPage.getTotalElements();
-        List<NewsPagingResponse> content = newsPage.get()
-                .map(mapper::entityToPagingResponse)
-                .toList();
+        List<NewsEntity> content = newsPage.getContent();
 
         return new ContentResponse<>(content, numberOfElements);
     }

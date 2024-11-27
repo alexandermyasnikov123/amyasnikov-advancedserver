@@ -7,7 +7,8 @@ import io.jsonwebtoken.security.Keys;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
-import net.dunice.newsapi.configurations.JwtConfiguration;
+import net.dunice.newsapi.constants.JwtDefaults;
+import net.dunice.newsapi.security.JwtService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,20 +18,13 @@ import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class JwtServiceImplTest {
-    JwtConfiguration configuration = new JwtConfiguration()
-            .setBearerSecret("8b8584852d185261d9505563cb4ab7cfabf0a6e6485aa8f0e5664a84396e25de5cb888636a057433861e5085806a96557356cf5ab0cc2c8aa712ea66ccce83f7")
-            .setUsernameClaim("username")
-            .setRoleClaim("role")
-            .setUuidClaim("uuid")
-            .setExpirationMinutes(10);
-
+public class JwtServiceTest {
     @NonFinal
-    JwtServiceImpl jwtService;
+    JwtService jwtService;
 
     @BeforeEach
     public void beforeEach() {
-        jwtService = new JwtServiceImpl(configuration);
+        jwtService = new JwtService();
     }
 
     @Test
@@ -49,9 +43,9 @@ public class JwtServiceImplTest {
         Long actualExpirationMillis = (Long) claims.get(Claims.EXPIRATION) - (Long) claims.get(Claims.ISSUED_AT);
         Long actualExpirationMinutes = TimeUnit.SECONDS.toMinutes(actualExpirationMillis);
 
-        Assertions.assertEquals(username, claims.get(configuration.getUsernameClaim()));
-        Assertions.assertEquals(role, claims.get(configuration.getRoleClaim()));
-        Assertions.assertEquals(uuid.toString(), claims.get(configuration.getUuidClaim()));
+        Assertions.assertEquals(username, claims.get(JwtDefaults.USERNAME_CLAIM));
+        Assertions.assertEquals(role, claims.get(JwtDefaults.ROLE_CLAIM));
+        Assertions.assertEquals(uuid.toString(), claims.get(JwtDefaults.ID_CLAIM));
         Assertions.assertEquals(expirationMinutes.intValue(), actualExpirationMinutes.intValue());
 
         Assertions.assertTrue(jwtService.isTokenValid(token, username, role, uuid));
@@ -66,7 +60,7 @@ public class JwtServiceImplTest {
     }
 
     private SecretKey decodeSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(configuration.getBearerSecret());
+        byte[] keyBytes = Decoders.BASE64.decode(JwtDefaults.BEARER_SECRET_HS512);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

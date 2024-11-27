@@ -1,7 +1,6 @@
 package net.dunice.newsapi.services.impls;
 
-import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dunice.newsapi.entities.LogEntity;
 import net.dunice.newsapi.repositories.LogsRepository;
@@ -11,11 +10,10 @@ import java.util.Date;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LoggerServiceImpl implements LoggerService {
     private final LogsRepository repository;
 
-    @Transactional
     @Override
     public void saveLog(String message, String level) {
         repository.save(LogEntity.builder()

@@ -1,8 +1,8 @@
 package net.dunice.newsapi.controllers;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import net.dunice.newsapi.constants.ValidationConstants;
+import lombok.RequiredArgsConstructor;
+import net.dunice.newsapi.constants.ValidationMessages;
 import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
@@ -19,11 +19,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.security.Principal;
 
 @RestController
 @RequestMapping(value = "user")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserController {
     private final UserService service;
 
@@ -35,7 +34,7 @@ public class UserController {
     @GetMapping(value = "{uuid}")
     public ResponseEntity<BaseSuccessResponse> loadUserById(
             @PathVariable
-            @UUID(message = ValidationConstants.MAX_UPLOAD_SIZE_EXCEEDED)
+            @UUID(message = ValidationMessages.MAX_UPLOAD_SIZE_EXCEEDED)
             String uuid
     ) {
         PublicUserResponse userResponse = service.loadUserByUuid(uuid);
@@ -60,12 +59,12 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<BaseSuccessResponse> deleteCurrentUser(Principal principal) {
-        service.deleteUserByUsername(principal.getName());
-        return ResponseEntity.ok(BaseSuccessResponse.success());
+    public ResponseEntity<BaseSuccessResponse> deleteCurrentUser(Authentication authentication) {
+        service.deleteUser(authentication);
+        return ResponseEntity.ok(new BaseSuccessResponse());
     }
 
     private String extractUuidFrom(Authentication authentication) {
-        return AuthenticationUtils.getUser(authentication).getUuid().toString();
+        return AuthenticationUtils.getUser(authentication).getId().toString();
     }
 }

@@ -1,7 +1,7 @@
 package net.dunice.newsapi.controllers;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
 import net.dunice.newsapi.dtos.responses.AuthUserResponse;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "auth")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
     private final AuthService service;
 

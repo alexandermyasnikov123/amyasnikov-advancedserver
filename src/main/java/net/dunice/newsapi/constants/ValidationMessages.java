@@ -1,8 +1,6 @@
 package net.dunice.newsapi.constants;
 
-public interface ValidationConstants {
-    String SUCCESS = "All done correctly";
-
+public interface ValidationMessages {
     String UNKNOWN = "unknown";
 
     String MUST_NOT_BE_NULL = "must not be null";
@@ -108,4 +106,6 @@ public interface ValidationConstants {
     String INVALID_JWT_TOKEN = "Invalid JWT token. Can't authenticate unknown user";
 
     String EMPTY_MULTIPART_FILE = "Multipart file can't be an empty file";
+
+    String NEWS_ID_MUST_BE_POSITIVE = "News id must be a positive value";
 }

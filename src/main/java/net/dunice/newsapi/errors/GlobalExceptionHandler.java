@@ -3,7 +3,7 @@ package net.dunice.newsapi.errors;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import net.dunice.newsapi.constants.ErrorCodes;
-import net.dunice.newsapi.constants.ValidationConstants;
+import net.dunice.newsapi.constants.ValidationMessages;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.context.MessageSourceResolvable;
@@ -17,16 +17,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.List;
 import java.util.stream.Stream;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private final Map<String, ErrorCodes> errors = Arrays.stream(ErrorCodes.values())
-            .collect(Collectors.toMap(ErrorCodes::getMessage, errorCodes -> errorCodes));
-
     @ExceptionHandler(value = HttpStatusCodeException.class)
     public ResponseEntity<BaseSuccessResponse> handleStatusCodeExceptions(HttpStatusCodeException exception) {
         return buildErrorResponse(Stream.of(exception.getStatusText()));
@@ -34,17 +29,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = BadCredentialsException.class)
     public ResponseEntity<BaseSuccessResponse> handleAuthenticationException() {
-        return buildErrorResponse(Stream.of(ValidationConstants.PASSWORD_NOT_VALID));
+        return buildErrorResponse(Stream.of(ValidationMessages.PASSWORD_NOT_VALID));
     }
 
     @ExceptionHandler(value = FileNotFoundException.class)
     public ResponseEntity<BaseSuccessResponse> handleFileNotFoundExceptions() {
-        return buildErrorResponse(Stream.of(ValidationConstants.EXCEPTION_HANDLER_NOT_PROVIDED));
+        return buildErrorResponse(Stream.of(ValidationMessages.EXCEPTION_HANDLER_NOT_PROVIDED));
     }
 
     @ExceptionHandler(value = FileUploadException.class)
     public ResponseEntity<BaseSuccessResponse> handleFileUploadExceptions() {
-        return buildErrorResponse(Stream.of(ValidationConstants.UNKNOWN));
+        return buildErrorResponse(Stream.of(ValidationMessages.UNKNOWN));
     }
 
     @ExceptionHandler(value = ErrorCodesException.class)
@@ -76,15 +71,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = MissingServletRequestParameterException.class)
-    public ResponseEntity<BaseSuccessResponse> handleRequestParamsException(MissingServletRequestParameterException exception) {
+    public ResponseEntity<BaseSuccessResponse> handleRequestParamsException(
+            MissingServletRequestParameterException exception
+    ) {
         return buildErrorResponse(Stream.of(exception.getParameterName()));
     }
 
     private ResponseEntity<BaseSuccessResponse> buildErrorResponse(Stream<String> messages) {
-        Integer[] statusCodes = messages.map(message ->
-                errors.getOrDefault(message, ErrorCodes.UNKNOWN).getStatusCode()
-        ).toList().toArray(Integer[]::new);
+        List<Integer> statusCodes = ErrorCodes
+                .findEntriesByMessages(messages)
+                .map(ErrorCodes::getStatusCode)
+                .toList();
 
-        return ResponseEntity.badRequest().body(BaseSuccessResponse.error(statusCodes));
+        return ResponseEntity.badRequest().body(new BaseSuccessResponse(statusCodes));
     }
 }

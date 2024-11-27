@@ -24,30 +24,36 @@ repositories {
 }
 
 dependencies {
-	val mapstructVersion = "1.6.2"
-	val jwtVersion = "0.12.6"
-
-	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-validation")
 	compileOnly("org.projectlombok:lombok")
 	testCompileOnly("org.projectlombok:lombok")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.springframework.security:spring-security-test")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+	implementation("com.h2database:h2")
+	runtimeOnly("org.postgresql:postgresql")
+
+	implementation("org.liquibase:liquibase-core")
+	implementation("net.coobird:thumbnailator:0.4.20")
+
+	val mapstructVersion = "1.6.2"
 	implementation("org.mapstruct:mapstruct:$mapstructVersion")
 	annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+
+	val jwtVersion = "0.12.6"
 	implementation("io.jsonwebtoken:jjwt-api:$jwtVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jwtVersion")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jwtVersion")
-	implementation("org.liquibase:liquibase-core")
-	implementation("net.coobird:thumbnailator:0.4.20")
-	implementation("com.h2database:h2")
+
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.security:spring-security-test")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
 }
 
 tasks.withType<Test> {

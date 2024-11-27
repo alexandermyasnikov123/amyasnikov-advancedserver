@@ -6,28 +6,25 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import net.dunice.newsapi.constants.ValidationConstants;
+import net.dunice.newsapi.constants.UserValidationConstraints;
+import net.dunice.newsapi.constants.ValidationMessages;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Size(
-        min = ValidEmail.MIN_EMAIL_LENGTH,
-        max = ValidEmail.MAX_EMAIL_LENGTH,
-        message = ValidationConstants.EMAIL_SIZE_NOT_VALID
+        min = UserValidationConstraints.MIN_EMAIL_LENGTH,
+        max = UserValidationConstraints.MAX_EMAIL_LENGTH,
+        message = ValidationMessages.EMAIL_SIZE_NOT_VALID
 )
-@NotNull(message = ValidationConstants.USER_EMAIL_NOT_NULL)
-@NotBlank(message = ValidationConstants.USER_EMAIL_NOT_VALID)
-@Email(message = ValidationConstants.USER_EMAIL_NOT_VALID)
+@NotNull(message = ValidationMessages.USER_EMAIL_NOT_NULL)
+@NotBlank(message = ValidationMessages.USER_EMAIL_NOT_VALID)
+@Email(message = ValidationMessages.USER_EMAIL_NOT_VALID)
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE_USE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidEmail {
-    int MIN_EMAIL_LENGTH = 3;
-
-    int MAX_EMAIL_LENGTH = 100;
-
     String message() default "";
 
     Class<?>[] groups() default {};

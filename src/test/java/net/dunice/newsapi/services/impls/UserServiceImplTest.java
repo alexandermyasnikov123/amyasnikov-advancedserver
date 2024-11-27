@@ -222,7 +222,7 @@ public class UserServiceImplTest {
             return null;
         }).when(repository).deleteUserEntityByUsername(Mockito.anyString());
 
-        service.deleteUserByUsername(Mockito.anyString());
+        service.deleteUser(Mockito.anyString());
 
         Assertions.assertTrue(deleteInRepoWasCalled.get());
     }
@@ -241,7 +241,7 @@ public class UserServiceImplTest {
         }).when(repository).deleteUserEntityByUsername(Mockito.anyString());
 
         ErrorCodesException actual = Assertions.assertThrowsExactly(ErrorCodesException.class, () -> {
-            service.deleteUserByUsername(Mockito.anyString());
+            service.deleteUser(Mockito.anyString());
         });
 
         Assertions.assertEquals(expected.getErrorCodes(), actual.getErrorCodes());

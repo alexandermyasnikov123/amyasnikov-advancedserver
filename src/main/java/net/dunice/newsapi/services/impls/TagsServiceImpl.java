@@ -1,7 +1,7 @@
 package net.dunice.newsapi.services.impls;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.dunice.newsapi.entities.TagEntity;
 import net.dunice.newsapi.repositories.TagsRepository;
 import net.dunice.newsapi.services.TagsService;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TagsServiceImpl implements TagsService {
     private final TagsRepository repository;
 

@@ -4,23 +4,28 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import net.dunice.newsapi.services.AuthService;
+import lombok.RequiredArgsConstructor;
+import net.dunice.newsapi.constants.JwtDefaults;
+import net.dunice.newsapi.entities.UserEntityDetails;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    public static final String BEARER_PREFIX = "Bearer ";
+    private final JwtService jwtService;
 
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-
-    private final AuthService service;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -28,25 +33,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        tryAuthenticate(request);
-        filterChain.doFilter(request, response);
-    }
-
-    @SuppressWarnings("WrapperTypeMayBePrimitive")
-    private void tryAuthenticate(HttpServletRequest request) {
-        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        Boolean hasBearerToken = authHeader != null && authHeader.startsWith(BEARER_PREFIX);
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        Boolean hasBearerToken = authHeader != null && authHeader.startsWith(JwtDefaults.HEADER_PREFIX);
 
         if (!hasBearerToken || SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
             return;
         }
 
-        String jwtToken = authHeader.substring(BEARER_PREFIX.length());
-        service.createAuthenticationTokenIfValid(jwtToken).ifPresent(authToken -> {
+        String jwtToken = authHeader.substring(JwtDefaults.HEADER_PREFIX.length());
+        createAuthTokenIfValid(jwtToken).ifPresent(authToken -> {
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authToken);
 
             SecurityContextHolder.setContext(context);
         });
+
+        filterChain.doFilter(request, response);
+    }
+
+    private Optional<AbstractAuthenticationToken> createAuthTokenIfValid(String jwtToken) {
+        String username = jwtService.extractUsername(jwtToken);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        Boolean isValid = userDetails instanceof UserEntityDetails entity ?
+                jwtService.isTokenValid(jwtToken, userDetails.getUsername(), entity.getRole(), entity.getId()) :
+                false;
+
+        AbstractAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+
+        return isValid ? Optional.of(authToken) : Optional.empty();
     }
 }

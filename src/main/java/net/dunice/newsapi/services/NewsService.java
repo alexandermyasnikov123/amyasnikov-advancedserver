@@ -2,13 +2,13 @@ package net.dunice.newsapi.services;
 
 import net.dunice.newsapi.dtos.requests.NewsRequest;
 import net.dunice.newsapi.dtos.responses.ContentResponse;
-import net.dunice.newsapi.dtos.responses.NewsPagingResponse;
-import net.dunice.newsapi.entities.UserEntity;
+import net.dunice.newsapi.entities.NewsEntity;
+import org.springframework.security.core.Authentication;
 
 public interface NewsService {
-    ContentResponse<NewsPagingResponse> loadAllPagingNews(Integer page, Integer perPage);
+    ContentResponse<NewsEntity> loadAllPagingNews(Integer page, Integer perPage);
 
-    ContentResponse<NewsPagingResponse> findAllPagingNews(
+    ContentResponse<NewsEntity> findAllPagingNews(
             Integer page,
             Integer perPage,
             String author,
@@ -16,15 +16,15 @@ public interface NewsService {
             String[] tags
     );
 
-    ContentResponse<NewsPagingResponse> findAllPagingNewsByUserUuid(
+    ContentResponse<NewsEntity> findAllPagingNewsByUserUuid(
             Integer page,
             Integer perPage,
             String uuid
     );
 
-    Long createNews(NewsRequest request, UserEntity owner);
+    Long createNews(NewsRequest request, Authentication authentication);
 
-    void updateNews(Long id, NewsRequest request, UserEntity owner);
+    void updateNews(Long id, NewsRequest request, Authentication authentication);
 
-    void deleteNews(Long id, UserEntity user);
+    void deleteNews(Long id, Authentication authentication);
 }

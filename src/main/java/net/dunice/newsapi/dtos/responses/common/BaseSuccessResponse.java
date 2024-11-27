@@ -1,37 +1,39 @@
 package net.dunice.newsapi.dtos.responses.common;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.annotation.Nullable;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Value;
-import lombok.experimental.NonFinal;
-import net.dunice.newsapi.constants.ErrorCodes;
+import lombok.Getter;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-@Value
-@NonFinal
-@JsonInclude(value = JsonInclude.Include.NON_NULL)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@Getter
 public class BaseSuccessResponse {
-    Integer statusCode;
+    private Integer statusCode = 1;
 
-    Boolean success = true;
+    private final Boolean success = true;
 
-    @Nullable
-    Date timeStamp;
+    private List<Integer> codes;
 
-    @Nullable
-    Iterable<Integer> codes;
+    @Getter(onMethod_ = @JsonAnyGetter)
+    private final Map<String, Object> payload = new HashMap<>();
 
-    public static BaseSuccessResponse success() {
-        return new BaseSuccessResponse(ErrorCodes.SUCCESS.getStatusCode(), null, null);
+    public BaseSuccessResponse() {
     }
 
-    public static BaseSuccessResponse error(Integer... codes) {
-        Integer statusCode = Arrays.stream(codes).min(Integer::compareTo).orElseThrow();
-        Date now = new Date();
-        return new BaseSuccessResponse(statusCode, now, Arrays.asList(codes));
+    public BaseSuccessResponse(List<Integer> codes) {
+        this.statusCode = codes.stream().min(Integer::compareTo).orElseThrow();
+        this.codes = codes;
+    }
+
+    public BaseSuccessResponse(Integer... codes) {
+        this(Arrays.stream(codes).toList());
+    }
+
+    public BaseSuccessResponse addPayload(String key, Object value) {
+        payload.put(key, value);
+        return this;
     }
 }

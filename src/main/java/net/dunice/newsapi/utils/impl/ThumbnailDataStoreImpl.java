@@ -1,12 +1,10 @@
 package net.dunice.newsapi.utils.impl;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import net.dunice.newsapi.configurations.UploadConfigurationProperties;
-import net.dunice.newsapi.configurations.UserConfigurationProperties;
 import net.dunice.newsapi.utils.MultipartFileDataStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
@@ -20,12 +18,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Component
-@AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
-    UploadConfigurationProperties uploadProperties;
+    @Value(value = "${user.dir}")
+    private final String userDirectory;
 
-    UserConfigurationProperties userProperties;
+    private final UploadConfigurationProperties uploadProperties;
 
     @Override
     public String compressAndStore(MultipartFile file, String baseApiPath) throws IOException {
@@ -56,7 +54,7 @@ public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
     }
 
     private String getOutputPath() {
-        return "%s/%s".formatted(userProperties.getDir(), uploadProperties.getDir());
+        return "%s/%s".formatted(userDirectory, uploadProperties.getDir());
     }
 
     private void saveAndCompressFileIfAbsent(MultipartFile file, File outputFile) throws IOException {

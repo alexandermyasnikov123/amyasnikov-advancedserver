@@ -2,8 +2,8 @@ package net.dunice.newsapi.interceptors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import net.dunice.newsapi.services.LoggerService;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpHeaders;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LoggerInterceptor implements HandlerInterceptor {
     private final LoggerService service;
 

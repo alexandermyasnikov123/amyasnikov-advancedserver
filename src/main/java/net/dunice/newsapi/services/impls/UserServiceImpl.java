@@ -2,7 +2,7 @@ package net.dunice.newsapi.services.impls;
 
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
@@ -12,13 +12,15 @@ import net.dunice.newsapi.errors.ErrorCodesException;
 import net.dunice.newsapi.mappers.UserEntityMapper;
 import net.dunice.newsapi.repositories.UsersRepository;
 import net.dunice.newsapi.services.UserService;
+import net.dunice.newsapi.utils.AuthenticationUtils;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     UsersRepository repository;
 
@@ -45,12 +47,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity loadUserByUsername(String username) {
-        return repository.findUserEntityByUsername(username).orElseThrow(this::getUserNotFoundException);
-    }
-
-    @Transactional
-    @Override
     public PublicUserResponse updateUser(String uuid, UpdateUserRequest request) {
         UUID mappedUuid = UUID.fromString(uuid);
         UserEntity original = repository.findById(mappedUuid).orElseThrow(this::getUserNotFoundException);
@@ -59,7 +55,6 @@ public class UserServiceImpl implements UserService {
         return mapper.entityToPublicResponse(entity);
     }
 
-    @Transactional
     @Override
     public PublicUserResponse insertUser(UserEntity entity) {
         String username = entity.getUsername();
@@ -75,11 +70,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteUserByUsername(String username) {
-        if (!hasUserWithUsername(username)) {
+    public void deleteUser(Authentication authentication) {
+        UserEntity user = AuthenticationUtils.getUser(authentication);
+        UUID userId = user.getId();
+
+        if (!hasUserWithId(userId)) {
             throw getUserNotFoundException();
         }
-        repository.deleteUserEntityByUsername(username);
+        repository.deleteById(userId);
     }
 
     private Boolean hasUserWithEmail(String email) {
@@ -88,6 +86,10 @@ public class UserServiceImpl implements UserService {
 
     private Boolean hasUserWithUsername(String username) {
         return repository.findUserEntityByUsername(username).isPresent();
+    }
+
+    private Boolean hasUserWithId(UUID id) {
+        return repository.findById(id).isPresent();
     }
 
     private RuntimeException getUserNotFoundException() {

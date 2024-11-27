@@ -1,7 +1,7 @@
 package net.dunice.newsapi.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.services.FilesService;
 import org.springframework.core.io.Resource;
@@ -16,12 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.MalformedURLException;
 
 @RestController
 @RequestMapping(value = "file")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class FileController {
     private final FilesService service;
 
@@ -38,10 +37,6 @@ public class FileController {
             @RequestParam MultipartFile file,
             HttpServletRequest request
     ) throws Exception {
-        String baseApiPath = ServletUriComponentsBuilder
-                .fromContextPath(request)
-                .toUriString();
-
-        return ResponseEntity.ok(service.storeFile(file, baseApiPath));
+        return ResponseEntity.ok(service.storeFile(file, request));
     }
 }
