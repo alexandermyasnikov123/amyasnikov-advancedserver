@@ -116,7 +116,9 @@ public enum ErrorCodes {
 
     INVALID_JWT_TOKEN(58, ValidationMessages.INVALID_JWT_TOKEN),
 
-    NEWS_ID_MUST_BE_POSITIVE(59, ValidationMessages.NEWS_ID_MUST_BE_POSITIVE);
+    NEWS_ID_MUST_BE_POSITIVE(59, ValidationMessages.NEWS_ID_MUST_BE_POSITIVE),
+
+    CANT_MODIFY_FOREIGN_NEWS(60, ValidationMessages.CANT_MODIFY_FOREIGN_NEWS);
 
     private static final Map<String, ErrorCodes> LAZY_ERROR_ENTRIES = Arrays.stream(values())
             .collect(Collectors.toMap(ErrorCodes::getMessage, errorCodes -> errorCodes));

@@ -13,6 +13,7 @@ import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.With;
 import net.dunice.newsapi.entities.callbacks.ImageDeleteCallbacks;
@@ -49,5 +50,6 @@ public class UserEntity {
 
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_entity_id", referencedColumnName = "uuid")
+    @EqualsAndHashCode.Exclude
     private List<NewsEntity> news;
 }

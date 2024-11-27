@@ -8,7 +8,6 @@ import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
 import net.dunice.newsapi.services.UserService;
-import net.dunice.newsapi.utils.AuthenticationUtils;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -43,7 +42,8 @@ public class UserController {
 
     @GetMapping(value = "info")
     public ResponseEntity<BaseSuccessResponse> loadCurrentUserInfo(Authentication authentication) {
-        return loadUserById(extractUuidFrom(authentication));
+        PublicUserResponse userResponse = service.loadCurrentUser(authentication);
+        return ResponseEntity.ok(new CustomSuccessResponse<>(userResponse));
     }
 
     @PutMapping
@@ -53,8 +53,7 @@ public class UserController {
             @RequestBody
             UpdateUserRequest request
     ) {
-        String uuid = extractUuidFrom(authentication);
-        PublicUserResponse userResponse = service.updateUser(uuid, request);
+        PublicUserResponse userResponse = service.updateUser(authentication, request);
         return ResponseEntity.ok(new CustomSuccessResponse<>(userResponse));
     }
 
@@ -62,9 +61,5 @@ public class UserController {
     public ResponseEntity<BaseSuccessResponse> deleteCurrentUser(Authentication authentication) {
         service.deleteUser(authentication);
         return ResponseEntity.ok(new BaseSuccessResponse());
-    }
-
-    private String extractUuidFrom(Authentication authentication) {
-        return AuthenticationUtils.getUser(authentication).getId().toString();
     }
 }

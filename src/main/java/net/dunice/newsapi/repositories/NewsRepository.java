@@ -28,5 +28,5 @@ public interface NewsRepository extends JpaRepository<NewsEntity, Long> {
     Page<NewsEntity> findAll(Pageable pageable);
 
     @EntityGraph(value = "news_graph_join_all")
-    Page<NewsEntity> findAllByAuthor_Id(UUID userId, Pageable pageable);
+    Page<NewsEntity> findAllByAuthorId(UUID userId, Pageable pageable);
 }

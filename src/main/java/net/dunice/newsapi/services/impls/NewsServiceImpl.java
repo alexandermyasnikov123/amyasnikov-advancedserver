@@ -16,7 +16,6 @@ import net.dunice.newsapi.services.TagsService;
 import net.dunice.newsapi.utils.AuthenticationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -35,27 +34,24 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public Long createNews(NewsRequest request, Authentication authentication) {
         UserEntity owner = AuthenticationUtils.getUser(authentication);
-        return saveNewsAndTags(null, request, owner).getId();
+        return saveNewsAndTags(0L, request, owner).getId();
     }
 
     @Override
     public void updateNews(Long id, NewsRequest request, Authentication authentication) {
         UserEntity owner = AuthenticationUtils.getUser(authentication);
-        runIfExistsOrElse(id, owner, ignored -> saveNewsAndTags(id, request, owner), () -> {
-        });
+        acceptIfCurrentUserIsAuthor(id, owner, ignored -> saveNewsAndTags(id, request, owner));
     }
 
     @Override
     public void deleteNews(Long id, Authentication authentication) {
         UserEntity owner = AuthenticationUtils.getUser(authentication);
-        runIfExistsOrElse(id, owner, repository::delete, () -> {
-            throw new ErrorCodesException(ErrorCodes.NEWS_NOT_FOUND);
-        });
+        acceptIfCurrentUserIsAuthor(id, owner, repository::delete);
     }
 
     @Override
     public ContentResponse<NewsEntity> loadAllPagingNews(Integer page, Integer perPage) {
-        Page<NewsEntity> newsPage = repository.findAll(buildPageRequest(page, perPage));
+        Page<NewsEntity> newsPage = repository.findAll(PageRequest.of(page - 1, perPage));
 
         return mapPageToResponse(newsPage);
     }
@@ -75,7 +71,7 @@ public class NewsServiceImpl implements NewsService {
                 lowerKeywords,
                 author,
                 tagsOrNull,
-                buildPageRequest(page, perPage)
+                PageRequest.of(page - 1, perPage)
         );
 
         return mapPageToResponse(newsPage);
@@ -87,20 +83,21 @@ public class NewsServiceImpl implements NewsService {
             Integer perPage,
             String uuid
     ) {
-        Page<NewsEntity> newsPage = repository.findAllByAuthor_Id(
+        Page<NewsEntity> newsPage = repository.findAllByAuthorId(
                 UUID.fromString(uuid),
-                buildPageRequest(page, perPage)
+                PageRequest.of(page - 1, perPage)
         );
 
         return mapPageToResponse(newsPage);
     }
 
-    private void runIfExistsOrElse(Long id, UserEntity owner, Consumer<NewsEntity> ifPresent, Runnable ifNotPresent) {
-        repository.findById(id).ifPresentOrElse(news -> {
-            if (news.getAuthor().getId().equals(owner.getId())) {
-                ifPresent.accept(news);
+    private void acceptIfCurrentUserIsAuthor(Long newsId, UserEntity currentUser, Consumer<NewsEntity> ifAuthor) {
+        repository.findById(newsId).ifPresent(news -> {
+            if (!currentUser.equals(news.getAuthor())) {
+                throw new ErrorCodesException(ErrorCodes.CANT_MODIFY_FOREIGN_NEWS);
             }
-        }, ifNotPresent);
+            ifAuthor.accept(news);
+        });
     }
 
     private NewsEntity saveNewsAndTags(Long id, NewsRequest request, UserEntity owner) {
@@ -110,10 +107,6 @@ public class NewsServiceImpl implements NewsService {
                         .setTags(tags)
                         .setAuthor(owner)
         );
-    }
-
-    private Pageable buildPageRequest(Integer page, Integer perPage) {
-        return PageRequest.of(page - 1, perPage);
     }
 
     private ContentResponse<NewsEntity> mapPageToResponse(Page<NewsEntity> newsPage) {

@@ -32,29 +32,28 @@ public class ThumbnailDataStoreImpl implements MultipartFileDataStore {
         String fileSimpleName = new SimpleDateFormat(uploadProperties.getPattern())
                 .format(new Date()) + uploadProperties.getImageExtension();
 
-        String filePath = "%s/%s".formatted(getOutputPath(), fileSimpleName);
+        String filePath = getOutputPath() + "/" + fileSimpleName;
 
         File output = new File(filePath);
         saveAndCompressFileIfAbsent(file, output);
 
-        return "%s/%s/%s".formatted(baseApiPath, uploadProperties.getFileProtocol(), fileSimpleName);
+        return baseApiPath + "/" + uploadProperties.getFileProtocol() + "/" + fileSimpleName;
     }
 
     @Override
     public Resource loadCompressedFile(String filename) throws MalformedURLException {
-        String filePath = "%s/%s".formatted(getOutputPath(), filename);
+        String filePath = getOutputPath() + "/" + filename;
         return new UrlResource(uploadProperties.getFileProtocol(), filePath);
     }
 
-    @Override
-    public Boolean deleteFileByName(String name) {
-        String path = "%s/%s".formatted(getOutputPath(), name);
+    public void deleteFileByName(String name) {
+        String path = getOutputPath() + "/" + name;
         File file = new File(path);
-        return file.delete();
+        file.delete();
     }
 
     private String getOutputPath() {
-        return "%s/%s".formatted(userDirectory, uploadProperties.getDir());
+        return userDirectory + "/" + uploadProperties.getDir();
     }
 
     private void saveAndCompressFileIfAbsent(MultipartFile file, File outputFile) throws IOException {

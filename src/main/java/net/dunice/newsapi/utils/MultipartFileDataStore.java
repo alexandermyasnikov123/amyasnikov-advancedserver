@@ -10,6 +10,5 @@ public interface MultipartFileDataStore {
 
     Resource loadCompressedFile(String filename) throws MalformedURLException;
 
-    @SuppressWarnings("UnusedReturnValue")
-    Boolean deleteFileByName(String name);
+    void deleteFileByName(String name);
 }

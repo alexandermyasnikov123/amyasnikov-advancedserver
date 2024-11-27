@@ -32,22 +32,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PublicUserResponse loadUserByUuid(String uuid) {
-        UserEntity entity = repository.findById(UUID.fromString(uuid)).orElseThrow(this::getUserNotFoundException);
+        UserEntity entity = repository
+                .findById(UUID.fromString(uuid))
+                .orElseThrow(() -> new ErrorCodesException(ErrorCodes.USER_NOT_FOUND));
 
         return mapper.entityToPublicResponse(entity);
     }
 
     @Override
+    public PublicUserResponse loadCurrentUser(Authentication authentication) {
+        return mapper.entityToPublicResponse(AuthenticationUtils.getUser(authentication));
+    }
+
+    @Override
     public PublicUserResponse loadByEmail(String email) {
-        UserEntity user = repository.findUserEntityByEmail(email).orElseThrow(this::getUserNotFoundException);
+        UserEntity user = repository
+                .findUserEntityByEmail(email)
+                .orElseThrow(() -> new ErrorCodesException(ErrorCodes.USER_NOT_FOUND));
+
         return mapper.entityToPublicResponse(user);
     }
 
     @Override
-    public PublicUserResponse updateUser(String uuid, UpdateUserRequest request) {
-        UUID mappedUuid = UUID.fromString(uuid);
-        UserEntity original = repository.findById(mappedUuid).orElseThrow(this::getUserNotFoundException);
-        UserEntity entity = repository.save(mapper.updateRequestToEntity(mappedUuid, original.getPassword(), request));
+    public PublicUserResponse updateUser(Authentication authentication, UpdateUserRequest request) {
+        UserEntity original = AuthenticationUtils.getUser(authentication);
+        UserEntity entity = mapper.updateRequestToEntity(original.getId(), original.getPassword(), request);
+        repository.save(entity);
 
         return mapper.entityToPublicResponse(entity);
     }
@@ -57,7 +67,8 @@ public class UserServiceImpl implements UserService {
         String username = entity.getUsername();
         String email = entity.getEmail();
 
-        if (hasUserWithEmail(email) || hasUserWithUsername(username)) {
+        if (repository.findUserEntityByEmail(email).isPresent() ||
+                repository.findUserEntityByUsername(username).isPresent()) {
             throw new ErrorCodesException(ErrorCodes.USER_ALREADY_EXISTS);
         }
 
@@ -71,25 +82,9 @@ public class UserServiceImpl implements UserService {
         UserEntity user = AuthenticationUtils.getUser(authentication);
         UUID userId = user.getId();
 
-        if (!hasUserWithId(userId)) {
-            throw getUserNotFoundException();
+        if (repository.findById(userId).isEmpty()) {
+            throw new ErrorCodesException(ErrorCodes.USER_NOT_FOUND);
         }
         repository.deleteById(userId);
-    }
-
-    private Boolean hasUserWithEmail(String email) {
-        return repository.findUserEntityByEmail(email).isPresent();
-    }
-
-    private Boolean hasUserWithUsername(String username) {
-        return repository.findUserEntityByUsername(username).isPresent();
-    }
-
-    private Boolean hasUserWithId(UUID id) {
-        return repository.findById(id).isPresent();
-    }
-
-    private RuntimeException getUserNotFoundException() {
-        return new ErrorCodesException(ErrorCodes.USER_NOT_FOUND);
     }
 }

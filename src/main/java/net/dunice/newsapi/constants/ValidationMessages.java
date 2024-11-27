@@ -108,4 +108,6 @@ public interface ValidationMessages {
     String EMPTY_MULTIPART_FILE = "Multipart file can't be an empty file";
 
     String NEWS_ID_MUST_BE_POSITIVE = "News id must be a positive value";
+
+    String CANT_MODIFY_FOREIGN_NEWS = "Can't modify or delete foreign articles";
 }

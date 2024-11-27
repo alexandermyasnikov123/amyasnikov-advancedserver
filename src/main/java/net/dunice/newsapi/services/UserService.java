@@ -11,9 +11,11 @@ public interface UserService {
 
     PublicUserResponse loadUserByUuid(String uuid);
 
+    PublicUserResponse loadCurrentUser(Authentication authentication);
+
     PublicUserResponse loadByEmail(String email);
 
-    PublicUserResponse updateUser(String uuid, UpdateUserRequest request);
+    PublicUserResponse updateUser(Authentication authentication, UpdateUserRequest request);
 
     PublicUserResponse insertUser(UserEntity entity);
 
