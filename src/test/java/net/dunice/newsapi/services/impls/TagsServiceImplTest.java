@@ -3,7 +3,7 @@ package net.dunice.newsapi.services.impls;
 import net.dunice.newsapi.BaseTestCase;
 import net.dunice.newsapi.entities.TagEntity;
 import net.dunice.newsapi.repositories.TagsRepository;
-import net.dunice.newsapi.services.constants.TagsTestDefaults;
+import net.dunice.newsapi.services.defaults.TagsTestDefaults;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

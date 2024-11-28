@@ -5,7 +5,7 @@ import net.dunice.newsapi.BaseTestCase;
 import net.dunice.newsapi.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.errors.ErrorCodesException;
-import net.dunice.newsapi.services.constants.FilesTestConstants;
+import net.dunice.newsapi.services.defaults.FilesTestConstants;
 import net.dunice.newsapi.utils.MultipartFileDataStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

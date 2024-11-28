@@ -4,7 +4,7 @@ import net.dunice.newsapi.BaseTestCase;
 import net.dunice.newsapi.mappers.UserEntityMapper;
 import net.dunice.newsapi.security.JwtService;
 import net.dunice.newsapi.services.UserService;
-import net.dunice.newsapi.services.constants.UserTestConstants;
+import net.dunice.newsapi.services.defaults.UserTestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;

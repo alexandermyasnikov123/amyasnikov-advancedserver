@@ -1,4 +1,4 @@
-package net.dunice.newsapi.services.constants;
+package net.dunice.newsapi.services.defaults;
 
 import net.dunice.newsapi.dtos.responses.common.CustomSuccessResponse;
 

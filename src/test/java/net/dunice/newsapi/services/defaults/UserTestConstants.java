@@ -1,4 +1,4 @@
-package net.dunice.newsapi.services.constants;
+package net.dunice.newsapi.services.defaults;
 
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
@@ -14,13 +14,15 @@ public interface UserTestConstants {
 
     String SIMPLE_PASSWORD = "password1234";
 
+    String SIMPLE_EMAIL = "simple.email@address.net";
+
     String JWT_TOKEN = Sha512DigestUtils.shaHex("some secret information");
 
     UserEntity COMMON_USER_ENTITY = new UserEntity(
             UUID.randomUUID(),
             "username_1",
-            "mail@email.net",
-            "password123",
+            SIMPLE_EMAIL,
+            SIMPLE_PASSWORD,
             "http://www.my-domain.com/image.jpg",
             "user",
             List.of()
