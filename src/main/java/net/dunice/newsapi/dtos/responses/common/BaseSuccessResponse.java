@@ -2,7 +2,9 @@ package net.dunice.newsapi.dtos.responses.common;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.Map;
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @Getter
+@EqualsAndHashCode
+@ToString
 public class BaseSuccessResponse {
     private Integer statusCode = 1;
 

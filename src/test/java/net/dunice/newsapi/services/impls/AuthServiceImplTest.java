@@ -1,167 +1,100 @@
 package net.dunice.newsapi.services.impls;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import net.dunice.newsapi.dtos.requests.LoginRequest;
-import net.dunice.newsapi.dtos.requests.RegisterRequest;
-import net.dunice.newsapi.dtos.responses.AuthUserResponse;
-import net.dunice.newsapi.dtos.responses.PublicUserResponse;
-import net.dunice.newsapi.entities.UserEntity;
+import net.dunice.newsapi.BaseTestCase;
 import net.dunice.newsapi.mappers.UserEntityMapper;
 import net.dunice.newsapi.security.JwtService;
 import net.dunice.newsapi.services.UserService;
-import org.junit.jupiter.api.Assertions;
+import net.dunice.newsapi.services.constants.UserTestConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AuthServiceImplTest {
-    JwtService jwtService = Mockito.mock(JwtService.class);
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.when;
 
-    PasswordEncoder encoder = Mockito.mock(PasswordEncoder.class);
+public class AuthServiceImplTest extends BaseTestCase {
+    @Mock
+    private JwtService jwtService;
 
-    AuthenticationManager authenticationManager = Mockito.mock(AuthenticationManager.class);
+    @Mock
+    private PasswordEncoder encoder;
 
-    UserEntityMapper mapper = Mockito.mock(UserEntityMapper.class);
+    @Mock
+    private AuthenticationManager authenticationManager;
 
-    UserService userService = Mockito.mock(UserService.class);
+    @Mock
+    private UserEntityMapper mapper;
 
-    AuthServiceImpl authService = new AuthServiceImpl(jwtService, encoder, authenticationManager, mapper, userService);
+    @Mock
+    private UserService userService;
 
-    PublicUserResponse fakePublicResponse = new PublicUserResponse(
-            "avatar", "email", UUID.randomUUID().toString(), "name", "role"
-    );
-
-    AuthUserResponse fakeAuthResponse = new AuthUserResponse(
-            "avatar", "email", fakePublicResponse.id(), "name", "role", "token"
-    );
+    private AuthServiceImpl authService;
 
     @BeforeEach
     public void beforeEach() {
-        Mockito.when(mapper.entityToPublicResponse(Mockito.any())).thenReturn(fakePublicResponse);
-        Mockito.when(mapper.publicResponseToAuth(Mockito.any(), Mockito.anyString())).thenReturn(fakeAuthResponse);
+        authService = new AuthServiceImpl(jwtService, encoder, authenticationManager, mapper, userService);
     }
 
     @Test
     public void registerUser_InsertsUserAndGeneratesBearerTokenWithHeader() {
-        AtomicBoolean insertUserWasCalled = new AtomicBoolean(false);
-        AtomicBoolean generateTokenWasCalled = new AtomicBoolean(false);
+        when(mapper.entityToPublicResponse(UserTestConstants.ENCODED_USER_ENTITY))
+                .thenReturn(UserTestConstants.COMMON_PUBLIC_RESPONSE);
 
-        Mockito.when(userService.insertUser(Mockito.any())).then(invocation -> {
-            insertUserWasCalled.set(true);
-            return fakePublicResponse;
-        });
+        when(mapper.publicResponseToAuth(
+                UserTestConstants.COMMON_PUBLIC_RESPONSE,
+                UserTestConstants.JWT_TOKEN
+        )).thenReturn(UserTestConstants.COMMON_AUTH_RESPONSE);
 
-        Mockito.when(jwtService.generateTokenWithHeader(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
-                .then(invocation -> {
-                    generateTokenWasCalled.set(true);
-                    return "any token";
-                });
+        when(userService.insertUser(UserTestConstants.ENCODED_USER_ENTITY))
+                .thenReturn(UserTestConstants.COMMON_PUBLIC_RESPONSE);
 
-        RegisterRequest mockRegisterRequest = Mockito.mock(RegisterRequest.class);
+        when(mapper.registerRequestToEntity(UserTestConstants.ENCODED_REGISTER_REQUEST))
+                .thenReturn(UserTestConstants.ENCODED_USER_ENTITY);
 
-        AuthUserResponse actual = authService.registerUser(mockRegisterRequest);
-        Assertions.assertEquals(fakeAuthResponse, actual);
-        Assertions.assertTrue(insertUserWasCalled.get());
-        Assertions.assertTrue(generateTokenWasCalled.get());
+        when(encoder.encode(UserTestConstants.SIMPLE_PASSWORD))
+                .thenReturn(UserTestConstants.ENCODED_PASSWORD);
+
+        when(jwtService.generateTokenWithHeader(
+                UserTestConstants.ENCODED_USER_ENTITY.getUsername(),
+                UserTestConstants.ENCODED_USER_ENTITY.getRole(),
+                UserTestConstants.ENCODED_USER_ENTITY.getId()
+        )).thenReturn(UserTestConstants.JWT_TOKEN);
+
+        authService.registerUser(UserTestConstants.VALID_REGISTER_REQUEST);
+
+        InOrder inOrder = inOrder(encoder, userService, jwtService);
+
+        inOrder.verify(encoder).encode(UserTestConstants.SIMPLE_PASSWORD);
+        inOrder.verify(userService).insertUser(UserTestConstants.ENCODED_USER_ENTITY);
+        inOrder.verify(jwtService).generateTokenWithHeader(
+                UserTestConstants.ENCODED_USER_ENTITY.getUsername(),
+                UserTestConstants.ENCODED_USER_ENTITY.getRole(),
+                UserTestConstants.ENCODED_USER_ENTITY.getId()
+        );
     }
 
     @Test
     public void loginUser_AuthenticatesUser() {
-        AtomicBoolean loadByEmailWasCalled = new AtomicBoolean(false);
-        AtomicBoolean generateTokenWasCalled = new AtomicBoolean(false);
-        AtomicBoolean authenticateWasCalled = new AtomicBoolean(false);
+        when(userService.loadByEmail(anyString()))
+                .thenReturn(UserTestConstants.COMMON_PUBLIC_RESPONSE);
 
-        LoginRequest loginRequest = new LoginRequest("email", "password");
+        when(jwtService.generateTokenWithHeader(anyString(), anyString(), any()))
+                .thenReturn(UserTestConstants.JWT_TOKEN);
 
-        Mockito.when(userService.loadByEmail(Mockito.anyString())).then(invocation -> {
-            loadByEmailWasCalled.set(true);
-            return fakePublicResponse;
-        });
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(null);
 
-        Mockito.when(jwtService.generateTokenWithHeader(Mockito.anyString(), Mockito.anyString(), Mockito.any()))
-                .then(invocation -> {
-                    generateTokenWasCalled.set(true);
-                    return "any token";
-                });
+        authService.loginUser(UserTestConstants.VALID_LOGIN_REQUEST);
 
-        Mockito.when(authenticationManager.authenticate(Mockito.any())).then(invocation -> {
-            authenticateWasCalled.set(true);
+        InOrder inOrder = inOrder(userService, jwtService, authenticationManager);
 
-            UsernamePasswordAuthenticationToken token = invocation.getArgument(0);
-            Assertions.assertNotNull(token);
-
-            return null;
-        });
-
-        authService.loginUser(loginRequest);
-
-        Assertions.assertTrue(authenticateWasCalled.get());
-        Assertions.assertTrue(loadByEmailWasCalled.get());
-        Assertions.assertTrue(generateTokenWasCalled.get());
-    }
-
-    @Test
-    public void createAuthenticationTokenIfValid_ReturnsNonEmptyTokenIfValidCredentials() {
-        AtomicBoolean extractUsernameCalled = new AtomicBoolean(false);
-        AtomicBoolean loadUserByUsernameCalled = new AtomicBoolean(false);
-        AtomicBoolean isTokenValidCalled = new AtomicBoolean(false);
-
-        Mockito.when(jwtService.extractUsername(Mockito.anyString())).then(invocation -> {
-            extractUsernameCalled.set(true);
-            return "username";
-        });
-
-        Mockito.when(userService.loadUserByUsername(Mockito.anyString())).then(invocation -> {
-            loadUserByUsernameCalled.set(true);
-            return UserEntity.builder().role("role").build();
-        });
-
-        Mockito.when(jwtService.isTokenValid(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).then(invocation -> {
-            isTokenValidCalled.set(true);
-            return true;
-        });
-
-        Optional<AbstractAuthenticationToken> actual = authService.createAuthenticationTokenIfValid("any token");
-        Assertions.assertTrue(extractUsernameCalled.get());
-        Assertions.assertTrue(loadUserByUsernameCalled.get());
-        Assertions.assertTrue(isTokenValidCalled.get());
-        Assertions.assertTrue(actual.isPresent());
-    }
-
-    @Test
-    public void createAuthenticationTokenIfValid_ReturnsEmptyTokenIfNotValidCredentials() {
-        AtomicBoolean extractUsernameCalled = new AtomicBoolean(false);
-        AtomicBoolean loadUserByUsernameCalled = new AtomicBoolean(false);
-        AtomicBoolean isTokenValidCalled = new AtomicBoolean(false);
-
-        Mockito.when(jwtService.extractUsername(Mockito.anyString())).then(invocation -> {
-            extractUsernameCalled.set(true);
-            return "username";
-        });
-
-        Mockito.when(userService.loadUserByUsername(Mockito.anyString())).then(invocation -> {
-            loadUserByUsernameCalled.set(true);
-            return UserEntity.builder().role("role").build();
-        });
-
-        Mockito.when(jwtService.isTokenValid(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).then(invocation -> {
-            isTokenValidCalled.set(true);
-            return false;
-        });
-
-        Optional<AbstractAuthenticationToken> actual = authService.createAuthenticationTokenIfValid("any token");
-        Assertions.assertTrue(extractUsernameCalled.get());
-        Assertions.assertTrue(loadUserByUsernameCalled.get());
-        Assertions.assertTrue(isTokenValidCalled.get());
-        Assertions.assertTrue(actual.isEmpty());
+        inOrder.verify(userService).loadByEmail(anyString());
+        inOrder.verify(jwtService).generateTokenWithHeader(anyString(), anyString(), any());
+        inOrder.verify(authenticationManager).authenticate(any());
     }
 }

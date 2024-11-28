@@ -1,94 +1,75 @@
 package net.dunice.newsapi.services.impls;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
+import net.dunice.newsapi.BaseTestCase;
 import net.dunice.newsapi.entities.TagEntity;
 import net.dunice.newsapi.repositories.TagsRepository;
+import net.dunice.newsapi.services.constants.TagsTestDefaults;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import java.util.ArrayList;
+import org.mockito.Mock;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class TagsServiceImplTest {
-    List<TagEntity> allTags = generateTags(10);
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-    List<String> allTitles = allTags.stream()
+public class TagsServiceImplTest extends BaseTestCase {
+    private final List<TagEntity> allTags = TagsTestDefaults.generateTags(10);
+
+    private final List<String> allTagsTitles = allTags.stream()
             .map(TagEntity::getTitle)
             .toList();
 
-    @NonFinal
-    TagsRepository repository;
+    @Mock
+    private TagsRepository repository;
 
-    @NonFinal
-    TagsServiceImpl service;
+    private TagsServiceImpl service;
 
     @BeforeEach
     public void beforeEach() {
-        repository = Mockito.mock(TagsRepository.class);
         service = new TagsServiceImpl(repository);
     }
 
     @Test
     public void storeTagsAndGet_ReturnsAllValuesIfExistsAndDoNotSaveAny() {
-        Mockito.when(repository.findAllByTitleIn(Mockito.anyList())).thenReturn(allTags);
-        Mockito.when(repository.saveAll(Mockito.any())).then(invocation -> Assertions.fail());
+        when(repository.findAllByTitleIn(allTagsTitles)).thenReturn(allTags);
 
-        var actual = service.storeTagsAndGet(allTitles);
+        var actual = service.storeTagsAndGet(allTagsTitles);
+
+        verify(repository).findAllByTitleIn(allTagsTitles);
+        verify(repository, never()).saveAll(allTags);
+
         Assertions.assertIterableEquals(allTags, actual);
     }
 
     @Test
     public void storeTagsAndGet_InsertAllTagsWhenValuesDoNotExists() {
-        AtomicBoolean saveAllWasCalled = new AtomicBoolean(false);
+        when(repository.findAllByTitleIn(allTagsTitles)).thenReturn(List.of());
+        when(repository.saveAll(allTags)).thenReturn(allTags);
 
-        Mockito.when(repository.findAllByTitleIn(Mockito.anyList())).thenReturn(List.of());
-        Mockito.when(repository.saveAll(Mockito.any())).then(invocation -> {
-            saveAllWasCalled.set(true);
-            return allTags;
-        });
+        var actual = service.storeTagsAndGet(allTagsTitles);
 
-        var actual = service.storeTagsAndGet(allTitles);
+        verify(repository).saveAll(allTags);
 
-        Assertions.assertTrue(saveAllWasCalled.get());
         Assertions.assertIterableEquals(allTags, actual);
     }
 
-    @SuppressWarnings({"unchecked", "WrapperTypeMayBePrimitive"})
+    @SuppressWarnings("WrapperTypeMayBePrimitive")
     @Test
     public void storeTagsAndGet_InsertsOnlyNonExistingTags() {
         Integer skipAmount = 3;
-        AtomicBoolean saveAllWasCalled = new AtomicBoolean(false);
 
         List<TagEntity> nonExistingTags = allTags.stream().skip(skipAmount).toList();
         List<TagEntity> alreadyExistingTags = allTags.stream().limit(skipAmount).toList();
 
-        List<String> nonExistingTitles = nonExistingTags.stream().map(TagEntity::getTitle).toList();
+        when(repository.findAllByTitleIn(allTagsTitles)).thenReturn(alreadyExistingTags);
+        when(repository.saveAll(nonExistingTags)).thenReturn(nonExistingTags);
 
-        Mockito.when(repository.findAllByTitleIn(Mockito.anyList())).thenReturn(alreadyExistingTags);
-        Mockito.when(repository.saveAll(Mockito.any())).then(invocation -> {
-            saveAllWasCalled.set(true);
-            var actualTags = (List<TagEntity>) invocation.getArgument(0);
-            var actualTitles = actualTags.stream().map(TagEntity::getTitle).toList();
+        var actual = service.storeTagsAndGet(allTagsTitles);
 
-            Assertions.assertIterableEquals(nonExistingTitles, actualTitles);
-            return nonExistingTags;
-        });
+        verify(repository).saveAll(nonExistingTags);
 
-        var actual = service.storeTagsAndGet(allTitles);
         Assertions.assertIterableEquals(allTags, actual);
-        Assertions.assertTrue(saveAllWasCalled.get());
-    }
-
-    private List<TagEntity> generateTags(Integer amount) {
-        List<TagEntity> result = new ArrayList<>();
-        for (var i = 1L; i <= amount; ++i) {
-            result.add(new TagEntity(i, "title_" + i));
-        }
-        return result;
     }
 }
