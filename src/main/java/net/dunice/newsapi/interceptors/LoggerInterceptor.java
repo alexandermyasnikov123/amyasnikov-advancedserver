@@ -1,20 +1,28 @@
 package net.dunice.newsapi.interceptors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.dunice.newsapi.services.LoggerService;
-import org.springframework.boot.logging.LogLevel;
+import net.dunice.newsapi.constants.ErrorCodes;
+import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
+import net.dunice.newsapi.entities.LogEntity;
+import net.dunice.newsapi.repositories.LogsRepository;
+import net.dunice.newsapi.utils.AuthenticationUtils;
+import net.dunice.newsapi.utils.HttpServletResponseUtils;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
 public class LoggerInterceptor implements HandlerInterceptor {
-    private final LoggerService service;
+    private final LogsRepository repository;
+
+    private final ObjectMapper mapper;
 
     @Override
     public void afterCompletion(
@@ -23,15 +31,31 @@ public class LoggerInterceptor implements HandlerInterceptor {
             @NonNull Object handler,
             Exception ex
     ) {
-        String requestUrl = request.getRequestURL().toString();
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String httpMethod = request.getMethod();
 
-        Integer responseStatus = response.getStatus();
+        LogEntity.LogEntityBuilder builder = LogEntity.builder()
+                .requestMethod(request.getMethod())
+                .responseCode(response.getStatus())
+                .endpoint(request.getRequestURL().toString())
+                .requireAuth(request.getHeader(HttpHeaders.AUTHORIZATION) != null)
+                .user(AuthenticationUtils.getCurrentUser());
 
-        String message = String.format("%d: %s - %s; token = %s", responseStatus, httpMethod, requestUrl, token);
-        String level = responseStatus >= HttpStatus.BAD_REQUEST.value() ? LogLevel.ERROR.name() : LogLevel.INFO.name();
+        HttpServletResponseUtils.findCachedResponseBody(response).ifPresent(body -> {
+            ErrorCodes errorCodes = findErrorCodesFromResponseBody(body);
+            builder.errorCodesMessage(errorCodes.getMessage()).errorCodesStatus(errorCodes.getStatusCode());
+        });
 
-        service.saveLog(message, level);
+        repository.save(builder.build());
+    }
+
+    private ErrorCodes findErrorCodesFromResponseBody(String body) {
+        try {
+            BaseSuccessResponse model = mapper.readValue(body, BaseSuccessResponse.class);
+            return ErrorCodes
+                    .findEntriesByStatusCodes(Stream.of(model.getStatusCode()))
+                    .findFirst()
+                    .orElseThrow();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -11,6 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public final class AuthenticationUtils {
     public static UserEntity getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ((UserEntityDetails) authentication.getPrincipal()).entity();
+
+        return authentication == null || !(authentication.getPrincipal() instanceof UserEntityDetails(UserEntity e)) ?
+                null :
+                e;
     }
 }

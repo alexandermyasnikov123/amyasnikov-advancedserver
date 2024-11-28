@@ -120,8 +120,15 @@ public enum ErrorCodes {
 
     CANT_MODIFY_FOREIGN_NEWS(60, ValidationMessages.CANT_MODIFY_FOREIGN_NEWS);
 
-    private static final Map<String, ErrorCodes> LAZY_ERROR_ENTRIES = Arrays.stream(values())
+    private static final Map<String, ErrorCodes> MESSAGES_ENTRIES = Arrays.stream(values())
             .collect(Collectors.toMap(ErrorCodes::getMessage, errorCodes -> errorCodes));
+
+    private static final Map<Integer, ErrorCodes> STATUS_CODES_ENTRIES = Arrays.stream(values())
+            .collect(Collectors.toMap(
+                    ErrorCodes::getStatusCode,
+                    errorCodes -> errorCodes,
+                    (old, current) -> current)
+            );
 
     private final Integer statusCode;
 
@@ -129,7 +136,13 @@ public enum ErrorCodes {
 
     public static Stream<ErrorCodes> findEntriesByMessages(Stream<String> messages) {
         return messages.map(message ->
-                ErrorCodes.LAZY_ERROR_ENTRIES.getOrDefault(message, ErrorCodes.UNKNOWN)
+                ErrorCodes.MESSAGES_ENTRIES.getOrDefault(message, ErrorCodes.UNKNOWN)
+        );
+    }
+
+    public static Stream<ErrorCodes> findEntriesByStatusCodes(Stream<Integer> statusCodes) {
+        return statusCodes.map(code ->
+                ErrorCodes.STATUS_CODES_ENTRIES.getOrDefault(code, ErrorCodes.UNKNOWN)
         );
     }
 }
