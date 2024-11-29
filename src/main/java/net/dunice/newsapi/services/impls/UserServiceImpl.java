@@ -77,11 +77,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser() {
         UserEntity user = AuthenticationUtils.getCurrentUser();
-        UUID userId = user.getId();
-
-        if (repository.findById(userId).isEmpty()) {
-            throw new ErrorCodesException(ErrorCodes.USER_NOT_FOUND);
-        }
-        repository.deleteById(userId);
+        repository.delete(user);
     }
 }

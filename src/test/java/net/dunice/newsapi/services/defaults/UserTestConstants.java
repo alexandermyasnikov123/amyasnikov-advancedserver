@@ -2,6 +2,7 @@ package net.dunice.newsapi.services.defaults;
 
 import net.dunice.newsapi.dtos.requests.LoginRequest;
 import net.dunice.newsapi.dtos.requests.RegisterRequest;
+import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
 import net.dunice.newsapi.dtos.responses.AuthUserResponse;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.entities.UserEntity;
@@ -61,5 +62,12 @@ public interface UserTestConstants {
     LoginRequest VALID_LOGIN_REQUEST = new LoginRequest(
             VALID_REGISTER_REQUEST.email(),
             VALID_REGISTER_REQUEST.password()
+    );
+
+    UpdateUserRequest UPDATE_USER_REQUEST = new UpdateUserRequest(
+            "http://new-domain.net/new-image.jpg",
+            "new_username_1",
+            "new.email@domain.net",
+            "new_role"
     );
 }
