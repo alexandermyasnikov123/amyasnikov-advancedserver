@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: news_entity
+        - tableExists:
+            tableName: user_entity
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: news_entity
+            constraintName: fk_user_uuid
+        - addForeignKeyConstraint:
+            referencedTableName: user_entity
+            referencedColumnNames: uuid
+            baseColumnNames: user_entity_id
+            baseTableName: news_entity
+            constraintName: fk_user_uuid
+            onDelete: CASCADE

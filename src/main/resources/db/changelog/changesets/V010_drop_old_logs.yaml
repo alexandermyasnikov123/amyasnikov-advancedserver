@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 10
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            tableName: logs
+      changes:
+        - dropTable:
+            tableName: logs

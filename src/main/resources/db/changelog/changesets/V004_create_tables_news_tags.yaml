@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: news_entity
+            - tableExists:
+                tableName: tag_entity
+            - tableExists:
+                tableName: news_with_tags
+      changes:
+        - createTable:
+            tableName: news_entity
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(160)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(160)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: image
+                  type: varchar(130)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_entity_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_uuid
+                    referencedTableName: user_entity
+                    referencedColumnNames: uuid
+        - createTable:
+            tableName: tag_entity
+            columns:
+              - column:
+                  name: id
+                  type: serial
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+        - createTable:
+            tableName: news_with_tags
+            columns:
+              - column:
+                  name: news_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: nwt_news_fk
+                    referencedTableName: news_entity
+                    referencedColumnNames: id
+                    nullable: false
+              - column:
+                  name: tag_id
+                  type: integer
+                  constraints:
+                    foreignKeyName: nwt_tags_fk
+                    referencedTableName: tag_entity
+                    referencedColumnNames: id
+                    nullable: false

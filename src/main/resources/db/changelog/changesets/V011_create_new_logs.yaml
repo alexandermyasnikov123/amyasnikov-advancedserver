@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - changeSet:
+      id: 11
+      author: Alexander Myasnikov
+      objectQuotingStrategy: LEGACY
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: logs
+      changes:
+        - createTable:
+            tableName: logs
+            columns:
+              - column:
+                  name: id
+                  type: integer
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: request_method
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: response_code
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: endpoint
+                  type: varchar(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: require_auth
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: error_codes_status
+                  type: integer
+                  constraints:
+                    nullable: true
+              - column:
+                  name: error_codes_message
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_uuid
+                  type: uuid
+                  constraints:
+                    nullable: true
+            indexes:
+              - index:
+                  name: idx_endpoint
+                  column: endpoint
+              - index:
+                  name: idx_message
+                  column: error_codes_message
