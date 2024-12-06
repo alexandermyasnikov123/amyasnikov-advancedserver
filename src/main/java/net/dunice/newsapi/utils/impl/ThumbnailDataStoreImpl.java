@@ -1,6 +1,7 @@
 package net.dunice.newsapi.utils.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import net.dunice.newsapi.configurations.UploadConfigurationProperties;
 import net.dunice.newsapi.utils.MultipartFileDataStore;
@@ -17,6 +18,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ThumbnailDataStoreImpl implements MultipartFileDataStore {

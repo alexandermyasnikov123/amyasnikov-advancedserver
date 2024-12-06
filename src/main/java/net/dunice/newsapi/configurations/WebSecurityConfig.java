@@ -3,6 +3,7 @@ package net.dunice.newsapi.configurations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dunice.newsapi.constants.AuthDefaults;
 import net.dunice.newsapi.constants.CorsDefaults;
 import net.dunice.newsapi.constants.ErrorCodes;
@@ -22,6 +23,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,6 +34,7 @@ import java.util.List;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
+@Slf4j
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
@@ -73,14 +76,15 @@ public class WebSecurityConfig implements WebMvcConfigurer {
             AuthenticationProvider provider,
             CorsConfigurationSource corsConfigurationSource
     ) throws Exception {
+        RequestMatcher toH2 = toH2Console();
         return http
                 .formLogin(FormLoginConfigurer::disable)
                 .headers(configurer -> configurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
-                .csrf(configurer -> configurer.ignoringRequestMatchers(toH2Console()).disable())
+                .csrf(configurer -> configurer.ignoringRequestMatchers(toH2).disable())
                 .cors(c -> c
                         .configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(customizer -> customizer
-                        .requestMatchers(toH2Console()).permitAll()
+                        .requestMatchers(toH2).permitAll()
                         .requestMatchers(AuthDefaults.FULL_PERMITTED_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, AuthDefaults.PERMITTED_GET_ENDPOINTS).permitAll()
                         .anyRequest().authenticated()
