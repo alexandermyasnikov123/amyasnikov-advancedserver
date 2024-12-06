@@ -42,14 +42,12 @@ dependencies {
 	implementation("org.liquibase:liquibase-core")
 	implementation("net.coobird:thumbnailator:0.4.20")
 
-	val mapstructVersion = "1.6.2"
-	implementation("org.mapstruct:mapstruct:$mapstructVersion")
-	annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+	implementation(libs.map.struct)
+	annotationProcessor(libs.map.struct.apt)
 
-	val jwtVersion = "0.12.6"
-	implementation("io.jsonwebtoken:jjwt-api:$jwtVersion")
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jwtVersion")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jwtVersion")
+	implementation(libs.jwt.api)
+	runtimeOnly(libs.jwt.impl)
+	runtimeOnly(libs.jwt.jackson)
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
@@ -63,4 +61,9 @@ tasks.withType<Test> {
 
 tasks.withType<Jar> {
 	enabled = true
+}
+
+task("printRootProjectName") {
+	group = "User defined"
+	println(rootProject.name)
 }

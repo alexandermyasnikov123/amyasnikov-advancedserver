@@ -1,0 +1,15 @@
+[versions]
+jjwt = "0.12.6"
+
+map-struct = "1.6.2"
+
+[libraries]
+jwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
+jwt-impl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jjwt" }
+jwt-jackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jjwt" }
+
+map-struct = { module = "org.mapstruct:mapstruct", version.ref = "map-struct" }
+map-struct-apt = { module = "org.mapstruct:mapstruct-processor", version.ref = "map-struct" }
+
+[bundles]
+jwt = ["jwt-api", "jwt-impl", "jwt-jackson"]
