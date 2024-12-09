@@ -1,8 +1,8 @@
 package net.dunice.newsapi.services.defaults;
 
-import net.dunice.newsapi.dtos.requests.LoginRequest;
-import net.dunice.newsapi.dtos.requests.RegisterRequest;
-import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
+import net.dunice.features.news.requests.LoginRequest;
+import net.dunice.features.news.requests.RegisterRequest;
+import net.dunice.features.news.requests.UpdateUserRequest;
 import net.dunice.newsapi.dtos.responses.AuthUserResponse;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.entities.UserEntity;

@@ -1,8 +1,9 @@
 package net.dunice.newsapi.services.impls;
 
+import net.dunice.features.news.repositories.TagsRepository;
+import net.dunice.features.news.services.impls.TagsServiceImpl;
+import net.dunice.features.shared.entities.TagEntity;
 import net.dunice.newsapi.BaseTestCase;
-import net.dunice.newsapi.entities.TagEntity;
-import net.dunice.newsapi.repositories.TagsRepository;
 import net.dunice.newsapi.services.defaults.TagsTestDefaults;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

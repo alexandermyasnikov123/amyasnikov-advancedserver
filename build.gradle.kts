@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
     java
     application
@@ -9,14 +11,35 @@ plugins {
 group = "net.dunice"
 version = "0.0.1-SNAPSHOT"
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+application {
+    mainClass = AppConstants.MAIN_CLASS
+}
+
+subprojects {
+    plugins.withType<SpringBootPlugin> {
+        tasks.bootJar {
+            enabled = false
+        }
     }
 }
 
-application {
-    mainClass = "net.dunice.newsapi.NewsApiApplication"
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+    plugins.withType<JavaPlugin> {
+        java {
+            toolchain {
+                languageVersion = AppConstants.javaVersion
+            }
+        }
+        dependencies {
+            compileOnly(libs.lombok)
+            annotationProcessor(libs.lombok)
+
+            testCompileOnly(libs.lombok)
+        }
+    }
 }
 
 configurations {
@@ -26,30 +49,26 @@ configurations {
 }
 
 dependencies {
-    compileOnly(libs.lombok)
-    testCompileOnly(libs.lombok)
-    annotationProcessor(libs.lombok)
-
     developmentOnly(libs.spring.dev.tools)
 
-    implementation(libs.bundles.spring.commons)
-
+    implementation(libs.spring.jpa)
+    implementation(libs.spring.web)
+    implementation(libs.spring.security) {
+        exclude(module = "spring-boot-starter-logging")
+    }
+    implementation(libs.spring.validation)
     runtimeOnly(libs.bundles.database.commons)
 
     implementation(libs.liquibase)
-    implementation(libs.thumbnailator)
-
-    implementation(libs.map.struct)
-    annotationProcessor(libs.map.struct.apt)
-
-    implementation(libs.jwt.api)
-    runtimeOnly(libs.jwt.impl)
-    runtimeOnly(libs.jwt.jackson)
 
     testImplementation(libs.spring.starter.test)
     testImplementation(libs.spring.security.test)
     testRuntimeOnly(libs.junit.platform.launcher)
 
+    implementation(project(":features:auth"))
+    implementation(project(":features:files"))
+    implementation(project(":features:news"))
+    implementation(project(":features:users"))
 }
 
 tasks.withType<Test> {

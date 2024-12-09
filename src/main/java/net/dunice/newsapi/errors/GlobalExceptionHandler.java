@@ -2,9 +2,10 @@ package net.dunice.newsapi.errors;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import net.dunice.newsapi.constants.ErrorCodes;
-import net.dunice.newsapi.constants.ValidationMessages;
-import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
+import net.dunice.features.core.dtos.constants.ErrorCodes;
+import net.dunice.features.core.dtos.constants.ValidationMessages;
+import net.dunice.features.core.dtos.exceptions.ErrorCodesException;
+import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
