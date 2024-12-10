@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = ErrorCodesException.class)
     public ResponseEntity<BaseSuccessResponse> handleErrorCodesExceptions(ErrorCodesException exception) {
-        return buildErrorResponse(Stream.of(exception.getErrorCodes().getMessage()));
+        return buildErrorResponse(exception.getErrorCodes().stream().map(ErrorCodes::getMessage));
     }
 
     @ExceptionHandler(value = ConstraintViolationException.class)

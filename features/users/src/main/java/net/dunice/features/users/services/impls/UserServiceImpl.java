@@ -3,13 +3,15 @@ package net.dunice.features.users.services.impls;
 import lombok.RequiredArgsConstructor;
 import net.dunice.features.core.dtos.constants.ErrorCodes;
 import net.dunice.features.core.dtos.exceptions.ErrorCodesException;
-import net.dunice.features.shared.entities.UserEntity;
-import net.dunice.features.users.dtos.requests.UpdateUserRequest;
-import net.dunice.features.users.dtos.responses.PublicUserResponse;
-import net.dunice.features.users.mappers.PublicUserMapper;
+import net.dunice.features.core.dtos.utils.ResponseUtils;
+import net.dunice.features.users.clients.AuthApiClient;
+import net.dunice.features.users.dtos.requests.UserRequest;
+import net.dunice.features.users.dtos.responses.CredentialsResponse;
+import net.dunice.features.users.dtos.responses.UserResponse;
+import net.dunice.features.users.entities.UserEntity;
+import net.dunice.features.users.mappers.UserMapper;
 import net.dunice.features.users.repositories.UsersRepository;
 import net.dunice.features.users.services.UserService;
-import net.dunice.features.users.utils.AuthenticationUtils;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
@@ -19,64 +21,67 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     private final UsersRepository repository;
 
-    private final PublicUserMapper mapper;
+    private final UserMapper mapper;
+
+    private final AuthApiClient authApiClient;
 
     @Override
-    public List<PublicUserResponse> loadAllUsers() {
+    public List<UserResponse> loadAllUsers() {
         return repository.findAll().stream()
-                .map(mapper::entityToPublicResponse)
+                .map(mapper::mapToResponse)
                 .toList();
     }
 
     @Override
-    public PublicUserResponse loadUserByUuid(String uuid) {
+    public UserResponse loadCurrent() {
+        CredentialsResponse response = ResponseUtils.tryExtractData(authApiClient.loadCurrentPrincipal());
+        return mapper.mapToResponse(response);
+    }
+
+    @Override
+    public UserResponse loadUserByUuid(UUID uuid) {
         UserEntity entity = repository
-                .findById(UUID.fromString(uuid))
+                .findById(uuid)
                 .orElseThrow(() -> new ErrorCodesException(ErrorCodes.USER_NOT_FOUND));
 
-        return mapper.entityToPublicResponse(entity);
+        return mapper.mapToResponse(entity);
     }
 
     @Override
-    public PublicUserResponse loadCurrentUser() {
-        return mapper.entityToPublicResponse(AuthenticationUtils.getCurrentUser());
-    }
-
-    @Override
-    public PublicUserResponse loadByEmail(String email) {
+    public UserResponse loadByEmail(String email) {
         UserEntity user = repository
                 .findUserEntityByEmail(email)
                 .orElseThrow(() -> new ErrorCodesException(ErrorCodes.USER_NOT_FOUND));
 
-        return mapper.entityToPublicResponse(user);
+        return mapper.mapToResponse(user);
     }
 
     @Override
-    public PublicUserResponse updateUser(UpdateUserRequest request) {
-        UserEntity original = AuthenticationUtils.getCurrentUser();
-        UserEntity entity = mapper.updateRequestToEntity(original.getId(), original.getPassword(), request);
+    public UserResponse updateUser(UserRequest request) {
+        UserResponse original = loadCurrent();
+        UserEntity entity = mapper.mapToEntity(original.id(), request);
         repository.save(entity);
 
-        return mapper.entityToPublicResponse(entity);
+        return mapper.mapToResponse(entity);
     }
 
     @Override
-    public PublicUserResponse insertUser(UserEntity entity) {
-        String username = entity.getUsername();
-        String email = entity.getEmail();
+    public UserResponse insertUser(UserRequest request) {
+        String username = request.name();
+        String email = request.email();
 
         if (repository.findUserEntityByEmail(email).isPresent() ||
                 repository.findUserEntityByUsername(username).isPresent()) {
             throw new ErrorCodesException(ErrorCodes.USER_ALREADY_EXISTS);
         }
 
-        UserEntity result = repository.save(entity);
-        return mapper.entityToPublicResponse(result);
+        UserEntity result = repository.save(mapper.mapToEntity(null, request));
+        return mapper.mapToResponse(result);
     }
 
     @Override
     public void deleteUser() {
-        UserEntity user = AuthenticationUtils.getCurrentUser();
-        repository.delete(user);
+        UserResponse current = loadCurrent();
+        repository.deleteById(current.id());
     }
 }

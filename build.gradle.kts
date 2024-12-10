@@ -27,6 +27,8 @@ allprojects {
     repositories {
         mavenCentral()
     }
+
+
     plugins.withType<JavaPlugin> {
         java {
             toolchain {
@@ -38,6 +40,20 @@ allprojects {
             annotationProcessor(libs.lombok)
 
             testCompileOnly(libs.lombok)
+        }
+    }
+
+    plugins.withType<SpringBootPlugin> {
+        dependencies {
+            implementation(libs.spring.log4j)
+            modules {
+                module(libs.spring.logback.get().module) {
+                    replacedBy(libs.spring.log4j.get().module)
+                }
+            }
+            configurations.all {
+                exclude(group = AppConstants.EXCLUDE_LOGBACK_GROUP, module = AppConstants.EXCLUDE_LOGBACK_MODULE)
+            }
         }
     }
 }
@@ -59,16 +75,15 @@ dependencies {
     implementation(libs.spring.validation)
     runtimeOnly(libs.bundles.database.commons)
 
+    implementation(libs.spring.eureka)
+
     implementation(libs.liquibase)
 
     testImplementation(libs.spring.starter.test)
     testImplementation(libs.spring.security.test)
     testRuntimeOnly(libs.junit.platform.launcher)
 
-    implementation(project(":features:auth"))
-    implementation(project(":features:files"))
-    implementation(project(":features:news"))
-    implementation(project(":features:users"))
+    implementation(project(":features:core"))
 }
 
 tasks.withType<Test> {

@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
-import net.dunice.features.shared.entities.UserEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import java.util.Date;
 
@@ -44,8 +43,4 @@ public class LogEntity {
     @Column
     @CreationTimestamp
     private Date date;
-
-    @ManyToOne
-    @JoinColumn(name = "user_uuid")
-    private UserEntity user;
 }

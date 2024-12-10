@@ -8,7 +8,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.dunice.features.core.dtos.constants.ErrorCodes;
 import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
-import net.dunice.features.users.utils.AuthenticationUtils;
 import net.dunice.newsapi.entities.LogEntity;
 import net.dunice.newsapi.impl.HttpServletResponseUtils;
 import net.dunice.newsapi.repositories.LogsRepository;
@@ -36,8 +35,7 @@ public class LoggerInterceptor implements HandlerInterceptor {
                 .requestMethod(request.getMethod())
                 .responseCode(response.getStatus())
                 .endpoint(request.getRequestURL().toString())
-                .requireAuth(request.getHeader(HttpHeaders.AUTHORIZATION) != null)
-                .user(AuthenticationUtils.getCurrentUser());
+                .requireAuth(request.getHeader(HttpHeaders.AUTHORIZATION) != null);
 
         HttpServletResponseUtils.findCachedResponseBody(response).ifPresent(body -> {
             ErrorCodes errorCodes = findErrorCodesFromResponseBody(body);

@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.dunice.features.auth.dtos.requests.LoginRequest;
 import net.dunice.features.auth.dtos.requests.RegisterRequest;
-import net.dunice.features.auth.dtos.responses.AuthUserResponse;
+import net.dunice.features.auth.dtos.responses.UserResponse;
 import net.dunice.features.auth.services.AuthService;
 import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.features.core.dtos.responses.common.CustomSuccessResponse;
@@ -22,13 +22,13 @@ public class AuthController {
 
     @PostMapping(value = "login")
     public ResponseEntity<BaseSuccessResponse> login(@Valid @RequestBody LoginRequest request) {
-        AuthUserResponse response = service.loginUser(request);
+        UserResponse response = service.loginUser(request);
         return ResponseEntity.ok(new CustomSuccessResponse<>(response));
     }
 
     @PostMapping(value = "register")
     public ResponseEntity<BaseSuccessResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthUserResponse response = service.registerUser(request);
+        UserResponse response = service.registerUser(request);
         return ResponseEntity.ok(new CustomSuccessResponse<>(response));
     }
 }

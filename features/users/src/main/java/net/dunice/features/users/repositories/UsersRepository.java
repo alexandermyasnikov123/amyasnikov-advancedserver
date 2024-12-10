@@ -1,6 +1,6 @@
 package net.dunice.features.users.repositories;
 
-import net.dunice.features.shared.entities.UserEntity;
+import net.dunice.features.users.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.UUID;

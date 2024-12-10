@@ -2,10 +2,10 @@ package net.dunice.features.auth.services;
 
 import net.dunice.features.auth.dtos.requests.LoginRequest;
 import net.dunice.features.auth.dtos.requests.RegisterRequest;
-import net.dunice.features.auth.dtos.responses.AuthUserResponse;
+import net.dunice.features.auth.dtos.responses.UserResponse;
 
 public interface AuthService {
-    AuthUserResponse registerUser(RegisterRequest request);
+    UserResponse registerUser(RegisterRequest request);
 
-    AuthUserResponse loginUser(LoginRequest request);
+    UserResponse loginUser(LoginRequest request);
 }

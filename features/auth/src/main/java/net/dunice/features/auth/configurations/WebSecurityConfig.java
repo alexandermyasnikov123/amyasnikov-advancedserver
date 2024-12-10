@@ -1,7 +1,6 @@
 package net.dunice.features.auth.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dunice.features.auth.constants.AuthDefaults;
@@ -28,26 +27,14 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig implements WebMvcConfigurer {
-    private static final List<String> LOGGING_ENDPOINTS = List.of("/**");
-
     private final ObjectMapper mapper;
-
-    private final HandlerInterceptor loggerInterceptor;
-
-    @Override
-    public void addInterceptors(@NonNull InterceptorRegistry registry) {
-        registry.addInterceptor(loggerInterceptor).addPathPatterns(LOGGING_ENDPOINTS);
-    }
 
     @Bean
     public CorsConfiguration getCorsConfiguration() {

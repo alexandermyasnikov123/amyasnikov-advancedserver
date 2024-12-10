@@ -12,7 +12,3 @@ fileTree("features").matching {
     include(":features:$moduleName")
     project(":features:$moduleName").projectDir = file.parentFile
 }
-include("features:news")
-findProject(":features:news")?.name = "news"
-include("features:user-shared-dtos")
-findProject(":features:user-shared-dtos")?.name = "user-shared-dtos"

@@ -4,11 +4,10 @@ import lombok.With;
 import java.util.UUID;
 
 @With
-public record PublicUserResponse(
-        String avatar,
-        String email,
+public record CredentialsResponse(
         UUID id,
-        String name,
+        String username,
+        String password,
         String role
 ) {
 }

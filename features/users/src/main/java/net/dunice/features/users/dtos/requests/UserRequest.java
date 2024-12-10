@@ -8,7 +8,7 @@ import net.dunice.features.users.constants.UserValidationConstraints;
 import net.dunice.features.users.validation.ValidEmail;
 
 @Builder
-public record UpdateUserRequest(
+public record UserRequest(
         @NotBlank(message = ValidationMessages.USER_AVATAR_NOT_NULL)
         @Size(
                 min = UserValidationConstraints.MIN_AVATAR_LENGTH,

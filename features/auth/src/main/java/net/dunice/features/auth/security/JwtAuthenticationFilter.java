@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.dunice.features.auth.constants.JwtDefaults;
-import net.dunice.features.users.entities.UserEntityDetails;
+import net.dunice.features.auth.entities.UserEntityDetails;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         Boolean isValid = userDetails instanceof UserEntityDetails entity ?
-                jwtService.isTokenValid(jwtToken, userDetails.getUsername(), entity.getRole(), entity.getId()) :
+                jwtService.isTokenValid(jwtToken, userDetails.getUsername(), entity.getRole(), entity.getUuid()) :
                 false;
 
         AbstractAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

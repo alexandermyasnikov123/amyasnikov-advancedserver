@@ -1,14 +1,13 @@
 package net.dunice.features.auth.services.impls;
 
 import lombok.RequiredArgsConstructor;
+import net.dunice.features.auth.clients.UserApiClient;
 import net.dunice.features.auth.dtos.requests.LoginRequest;
 import net.dunice.features.auth.dtos.requests.RegisterRequest;
-import net.dunice.features.auth.dtos.responses.AuthUserResponse;
-import net.dunice.features.auth.mappers.AuthUserMapper;
+import net.dunice.features.auth.dtos.responses.UserResponse;
 import net.dunice.features.auth.security.JwtService;
 import net.dunice.features.auth.services.AuthService;
-import net.dunice.features.users.dtos.responses.PublicUserResponse;
-import net.dunice.features.users.services.UserService;
+import net.dunice.features.core.dtos.utils.ResponseUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,14 +22,13 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
 
-    private final AuthUserMapper mapper;
-
-    private final UserService userService;
+    private final UserApiClient userApiClient;
 
     @Override
-    public AuthUserResponse registerUser(RegisterRequest request) {
-        RegisterRequest encodedRequest = request.withEncodedPassword(encoder);
-        PublicUserResponse response = userService.insertUser(mapper.registerRequestToEntity(encodedRequest));
+    public UserResponse registerUser(RegisterRequest request) {
+        UserResponse response = ResponseUtils.tryExtractData(
+                userApiClient.insertUser(request.withEncodedPassword(encoder))
+        );
 
         String token = jwtService.generateTokenWithHeader(
                 response.name(),
@@ -38,12 +36,15 @@ public class AuthServiceImpl implements AuthService {
                 response.id()
         );
 
-        return mapper.publicResponseToAuth(response, token);
+        return response.withToken(token);
     }
 
     @Override
-    public AuthUserResponse loginUser(LoginRequest request) {
-        PublicUserResponse response = userService.loadByEmail(request.email());
+    public UserResponse loginUser(LoginRequest request) {
+        UserResponse response = ResponseUtils.tryExtractData(
+                userApiClient.loadByEmail(request.email())
+        );
+
         String token = jwtService.generateTokenWithHeader(
                 response.name(),
                 response.role(),
@@ -54,6 +55,6 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(response.name(), request.password())
         );
 
-        return mapper.publicResponseToAuth(response, token);
+        return response.withToken(token);
     }
 }
