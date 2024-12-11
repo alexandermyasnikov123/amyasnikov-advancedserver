@@ -60,6 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 jwtService.isTokenValid(jwtToken, userDetails.getUsername(), entity.getUuid()) :
                 false;
 
+        System.out.println("UserDetails = " + userDetails);
+
         AbstractAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 userDetails,
                 null,

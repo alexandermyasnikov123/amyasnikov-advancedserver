@@ -18,4 +18,6 @@ public interface AuthConstants {
     int MIN_EMAIL_LENGTH = 3;
 
     int MAX_EMAIL_LENGTH = 100;
+
+    String ONLY_ROLE = "user";
 }

@@ -3,7 +3,7 @@ package net.dunice.features.auth.configurations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.dunice.features.auth.constants.AuthDefaults;
+import net.dunice.features.auth.constants.CorsMappings;
 import net.dunice.features.auth.constants.CorsDefaults;
 import net.dunice.features.auth.security.JwtAuthenticationFilter;
 import net.dunice.features.core.dtos.constants.ErrorCodes;
@@ -71,8 +71,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(customizer -> customizer
                         .requestMatchers(toH2).permitAll()
-                        .requestMatchers(AuthDefaults.FULL_PERMITTED_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET, AuthDefaults.PERMITTED_GET_ENDPOINTS).permitAll()
+                        .requestMatchers(CorsMappings.FULL_PERMITTED_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, CorsMappings.PERMITTED_GET_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.POST, CorsMappings.PERMITTED_POST_ENDPOINT).permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(provider)

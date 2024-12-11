@@ -10,6 +10,7 @@ import net.dunice.features.users.dtos.requests.UserRequest;
 import net.dunice.features.users.dtos.responses.UserResponse;
 import net.dunice.features.users.services.UserService;
 import org.hibernate.validator.constraints.UUID;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,14 +45,17 @@ public class UserController {
     }
 
     @GetMapping(value = "info")
-    public ResponseEntity<BaseSuccessResponse> loadCurrentUserInfo() {
-        UserResponse userResponse = service.loadCurrent();
+    public ResponseEntity<BaseSuccessResponse> loadCurrentUserInfo(@RequestHeader HttpHeaders headers) {
+        UserResponse userResponse = service.loadCurrent(headers);
         return ResponseEntity.ok(new CustomSuccessResponse<>(userResponse));
     }
 
     @PutMapping
-    public ResponseEntity<BaseSuccessResponse> updateCurrentUser(@Valid @RequestBody UserRequest request) {
-        UserResponse userResponse = service.updateUser(request);
+    public ResponseEntity<BaseSuccessResponse> updateCurrentUser(
+            @Valid @RequestBody UserRequest request,
+            @RequestHeader HttpHeaders headers
+    ) {
+        UserResponse userResponse = service.updateUser(headers, request);
         return ResponseEntity.ok(new CustomSuccessResponse<>(userResponse));
     }
 
@@ -61,8 +66,8 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<BaseSuccessResponse> deleteCurrentUser() {
-        service.deleteUser();
+    public ResponseEntity<BaseSuccessResponse> deleteCurrentUser(@RequestHeader HttpHeaders headers) {
+        service.deleteUser(headers);
         return ResponseEntity.ok(new BaseSuccessResponse());
     }
 }

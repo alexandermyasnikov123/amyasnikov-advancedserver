@@ -5,7 +5,7 @@ import java.util.UUID;
 
 @With
 public record CredentialsResponse(
-        UUID id,
+        UUID uuid,
         String username,
         String password,
         String role
