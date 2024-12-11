@@ -3,7 +3,7 @@ package net.dunice.features.files.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
-import net.dunice.features.files_api.services.FilesService;
+import net.dunice.features.files.services.FilesService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

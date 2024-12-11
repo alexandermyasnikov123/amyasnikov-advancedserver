@@ -8,7 +8,7 @@ import net.dunice.features.core.dtos.exceptions.ErrorCodesException;
 import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.features.core.dtos.responses.common.CustomSuccessResponse;
 import net.dunice.features.files.datastore.MultipartFileDataStore;
-import net.dunice.features.files_api.services.FilesService;
+import net.dunice.features.files.services.FilesService;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,4 +1,4 @@
-package net.dunice.features.files_api.services;
+package net.dunice.features.files.services;
 
 import jakarta.servlet.http.HttpServletRequest;
 import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
