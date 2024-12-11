@@ -14,6 +14,7 @@ dependencies {
     implementation(libs.bundles.spring.commons)
 
     runtimeOnly(libs.h2.db)
+    implementation(libs.spring.eureka.client)
 
     implementation(libs.bundles.feign.commons)
 
@@ -22,6 +23,9 @@ dependencies {
     runtimeOnly(libs.jwt.jackson)
 
     api(project(":features:core"))
+
+    testImplementation(libs.spring.starter.test)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.test {

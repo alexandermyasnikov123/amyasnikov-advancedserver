@@ -1,5 +1,7 @@
 package net.dunice.features.auth.dtos.responses;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.With;
 import org.gradle.internal.impldep.com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.UUID;
@@ -7,11 +9,14 @@ import java.util.UUID;
 @With
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public record UserResponse(
-        String avatar,
-        String email,
-        UUID id,
-        String name,
-        String role,
-        String token
+        @JsonProperty String avatar,
+        @JsonProperty String email,
+        @JsonProperty UUID id,
+        @JsonProperty String name,
+        @JsonProperty String role,
+        @JsonProperty String token
 ) {
+    @JsonCreator
+    public UserResponse {
+    }
 }

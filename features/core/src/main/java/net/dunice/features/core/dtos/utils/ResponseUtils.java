@@ -12,10 +12,10 @@ import java.util.stream.Stream;
 public final class ResponseUtils {
 
     public static <T> T tryExtractData(BaseSuccessResponse response) {
-
+        System.out.println("Response came here: " + response);
         return switch (response) {
             case CustomSuccessResponse<?> successResponse -> (T) successResponse.getData();
-            case BaseSuccessResponse baseResponse when CollectionUtils.isNullOrEmpty(baseResponse.getCodes()) -> {
+            case BaseSuccessResponse baseResponse when !CollectionUtils.isNullOrEmpty(baseResponse.getCodes()) -> {
                 Stream<ErrorCodes> errorCodes = ErrorCodes.findEntriesByStatusCodes(baseResponse.getCodes().stream());
                 throw new ErrorCodesException(errorCodes.toList());
             }

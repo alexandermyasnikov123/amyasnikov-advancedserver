@@ -1,10 +1,14 @@
 package net.dunice.features.core.dtos.responses.common;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
+import lombok.NoArgsConstructor;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class CustomSuccessResponse<T> extends BaseSuccessResponse {
-    T data;
+    private T data;
 }

@@ -23,18 +23,17 @@ public class JwtService {
                 .get(JwtDefaults.USERNAME_CLAIM, String.class);
     }
 
-    public Boolean isTokenValid(String token, String username, String role, UUID uuid) {
+    public Boolean isTokenValid(String token, String username, UUID uuid) {
         Claims claims = extractClaims(token);
 
         Boolean isNotExpired = claims.getExpiration().after(new Date());
         Boolean validUsername = claims.get(JwtDefaults.USERNAME_CLAIM).equals(username);
-        Boolean validRole = claims.get(JwtDefaults.ROLE_CLAIM).equals(role);
         Boolean validUuid = claims.get(JwtDefaults.ID_CLAIM).equals(uuid.toString());
 
-        return isNotExpired && validUsername && validRole && validUuid;
+        return isNotExpired && validUsername && validUuid;
     }
 
-    public String generateTokenWithHeader(String username, String role, UUID uuid) {
+    public String generateTokenWithHeader(String username, UUID uuid) {
         Calendar calendar = Calendar.getInstance();
 
         Date now = calendar.getTime();
@@ -43,7 +42,6 @@ public class JwtService {
 
         Map<String, Object> claims = Map.of(
                 JwtDefaults.USERNAME_CLAIM, username,
-                JwtDefaults.ROLE_CLAIM, role,
                 JwtDefaults.ID_CLAIM, uuid
         );
 

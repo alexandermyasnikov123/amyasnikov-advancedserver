@@ -57,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         Boolean isValid = userDetails instanceof UserEntityDetails entity ?
-                jwtService.isTokenValid(jwtToken, userDetails.getUsername(), entity.getRole(), entity.getUuid()) :
+                jwtService.isTokenValid(jwtToken, userDetails.getUsername(), entity.getUuid()) :
                 false;
 
         AbstractAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

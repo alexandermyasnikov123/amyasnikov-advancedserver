@@ -40,6 +40,7 @@ allprojects {
             annotationProcessor(libs.lombok)
 
             testCompileOnly(libs.lombok)
+            testAnnotationProcessor(libs.lombok)
         }
     }
 
@@ -69,13 +70,11 @@ dependencies {
 
     implementation(libs.spring.jpa)
     implementation(libs.spring.web)
-    implementation(libs.spring.security) {
-        exclude(module = "spring-boot-starter-logging")
-    }
     implementation(libs.spring.validation)
     runtimeOnly(libs.bundles.database.commons)
 
-    implementation(libs.spring.eureka)
+    implementation(libs.spring.eureka.server)
+    implementation(libs.spring.actuator)
 
     implementation(libs.liquibase)
 

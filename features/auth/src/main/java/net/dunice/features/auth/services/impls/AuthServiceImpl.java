@@ -32,7 +32,6 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateTokenWithHeader(
                 response.name(),
-                response.role(),
                 response.id()
         );
 
@@ -47,7 +46,6 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateTokenWithHeader(
                 response.name(),
-                response.role(),
                 response.id()
         );
 
