@@ -5,19 +5,27 @@ import lombok.RequiredArgsConstructor;
 import net.dunice.features.core.dtos.constants.ErrorCodes;
 import net.dunice.features.core.dtos.exceptions.ErrorCodesException;
 import net.dunice.features.core.dtos.responses.ContentResponse;
+import net.dunice.features.core.dtos.utils.ResponseUtils;
+import net.dunice.features.news.clients.AuthApiClient;
+import net.dunice.features.news.dtos.reponses.CredentialsResponse;
 import net.dunice.features.news.dtos.requests.NewsRequest;
+import net.dunice.features.news.entities.NewsEntity;
+import net.dunice.features.news.entities.TagEntity;
+import net.dunice.features.news.kafka.ImageDeletionProducer;
+import net.dunice.features.news.mappers.NewsMapper;
+import net.dunice.features.news.repositories.NewsRepository;
 import net.dunice.features.news.services.NewsService;
 import net.dunice.features.news.services.TagsService;
-import net.dunice.features.news.repositories.NewsRepository;
-import net.dunice.features.news.mappers.NewsMapper;
-import net.dunice.features.shared.entities.NewsEntity;
-import net.dunice.features.shared.entities.TagEntity;
-import net.dunice.features.shared.entities.UserEntity;
-import net.dunice.features.users.utils.AuthenticationUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -30,22 +38,51 @@ public class NewsServiceImpl implements NewsService {
 
     private final NewsMapper mapper;
 
+    private final AuthApiClient apiClient;
+
+    private final ImageDeletionProducer eventProducer;
+
+    @Lazy
+    @Autowired
+    private NewsServiceImpl service;
+
     @Override
-    public Long createNews(NewsRequest request) {
-        UserEntity owner = AuthenticationUtils.getCurrentUser();
-        return saveNewsAndTags(0L, request, owner).getId();
+    public Long createNews(NewsRequest request, HttpHeaders headers) {
+        CredentialsResponse ownerCredentials = loadCurrentUser(headers);
+        return service.saveNewsAndTags(null, request, ownerCredentials).getId();
     }
 
     @Override
-    public void updateNews(Long id, NewsRequest request) {
-        UserEntity owner = AuthenticationUtils.getCurrentUser();
-        acceptIfCurrentUserIsAuthor(id, owner, ignored -> saveNewsAndTags(id, request, owner));
+    public void updateNews(Long id, NewsRequest request, HttpHeaders headers) {
+        CredentialsResponse ownerCredentials = loadCurrentUser(headers);
+        acceptIfCurrentUserIsAuthor(
+                id,
+                ownerCredentials,
+                oldEntity -> {
+                    NewsEntity newEntity = service.saveNewsAndTags(id, request, ownerCredentials);
+                    String oldImage = oldEntity.getImage();
+                    if (!newEntity.getImage().equals(oldImage)) {
+                        eventProducer.produceImageDeleted(oldImage);
+                    }
+                }
+        );
     }
 
     @Override
-    public void deleteNews(Long id) {
-        UserEntity owner = AuthenticationUtils.getCurrentUser();
-        acceptIfCurrentUserIsAuthor(id, owner, repository::delete);
+    @Transactional
+    public void deleteNews(Long id, HttpHeaders headers) {
+        CredentialsResponse ownerCredentials = loadCurrentUser(headers);
+        acceptIfCurrentUserIsAuthor(id, ownerCredentials, newsEntity -> {
+            repository.delete(newsEntity);
+            eventProducer.produceImageDeleted(newsEntity.getImage());
+        });
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllUserNews(String username) {
+        repository.deleteAllByAuthorUsername(username);
+        //TODO: Delete all images here
     }
 
     @Override
@@ -90,9 +127,22 @@ public class NewsServiceImpl implements NewsService {
         return mapPageToResponse(newsPage);
     }
 
-    private void acceptIfCurrentUserIsAuthor(Long newsId, UserEntity currentUser, Consumer<NewsEntity> ifAuthor) {
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public NewsEntity saveNewsAndTags(Long id, NewsRequest request, CredentialsResponse credentials) {
+        Set<TagEntity> tags = tagsService.storeTagsAndGet(request.tags());
+
+        return repository.save(
+                mapper.requestToEntity(id, request, credentials).setTags(tags)
+        );
+    }
+
+    private void acceptIfCurrentUserIsAuthor(
+            Long newsId,
+            CredentialsResponse ownerCredentials,
+            Consumer<NewsEntity> ifAuthor
+    ) {
         repository.findById(newsId).ifPresentOrElse(news -> {
-            if (!currentUser.equals(news.getAuthor())) {
+            if (!ownerCredentials.username().equals(news.getAuthorUsername())) {
                 throw new ErrorCodesException(ErrorCodes.CANT_MODIFY_FOREIGN_NEWS);
             }
             ifAuthor.accept(news);
@@ -101,19 +151,14 @@ public class NewsServiceImpl implements NewsService {
         });
     }
 
-    private NewsEntity saveNewsAndTags(Long id, NewsRequest request, UserEntity owner) {
-        List<TagEntity> tags = tagsService.storeTagsAndGet(request.tags());
-        return repository.save(
-                mapper.requestToEntity(id, request)
-                        .setTags(tags)
-                        .setAuthor(owner)
-        );
-    }
-
     private ContentResponse<NewsEntity> mapPageToResponse(Page<NewsEntity> newsPage) {
         Long numberOfElements = newsPage.getTotalElements();
         List<NewsEntity> content = newsPage.getContent();
 
         return new ContentResponse<>(content, numberOfElements);
+    }
+
+    private CredentialsResponse loadCurrentUser(HttpHeaders headers) {
+        return ResponseUtils.tryExtractData(apiClient.loadCurrentPrincipal(headers));
     }
 }

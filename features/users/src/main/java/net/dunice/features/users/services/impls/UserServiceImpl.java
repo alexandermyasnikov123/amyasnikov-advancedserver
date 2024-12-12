@@ -13,6 +13,7 @@ import net.dunice.features.users.kafka.UserImageProducer;
 import net.dunice.features.users.mappers.UserMapper;
 import net.dunice.features.users.repositories.UsersRepository;
 import net.dunice.features.users.services.UserService;
+import net.dunice.features.users.validation.ValidEmail;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,15 @@ public class UserServiceImpl implements UserService {
     public UserResponse loadUserByUuid(UUID uuid) {
         UserEntity entity = repository
                 .findById(uuid)
+                .orElseThrow(() -> new ErrorCodesException(ErrorCodes.USER_NOT_FOUND));
+
+        return mapper.mapToResponse(entity);
+    }
+
+    @Override
+    public UserResponse loadUserByEmail(@ValidEmail String email) {
+        UserEntity entity = repository
+                .findByEmail(email)
                 .orElseThrow(() -> new ErrorCodesException(ErrorCodes.USER_NOT_FOUND));
 
         return mapper.mapToResponse(entity);

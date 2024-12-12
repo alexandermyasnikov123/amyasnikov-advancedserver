@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import net.dunice.features.core.dtos.constants.ValidationMessages;
 import net.dunice.features.news.constants.NewsValidationConstraints;
-import net.dunice.features.users.constants.UserValidationConstraints;
 import java.util.List;
 
 public record NewsRequest(
@@ -17,8 +16,8 @@ public record NewsRequest(
         String title,
         @NotBlank(message = ValidationMessages.NEWS_DESCRIPTION_NOT_NULL)
         @Size(
-                min = UserValidationConstraints.MIN_DESCRIPTION_LENGTH,
-                max = UserValidationConstraints.MAX_DESCRIPTION_LENGTH,
+                min = NewsValidationConstraints.MIN_DESCRIPTION_LENGTH,
+                max = NewsValidationConstraints.MAX_DESCRIPTION_LENGTH,
                 message = ValidationMessages.NEWS_DESCRIPTION_SIZE
         )
         String description,

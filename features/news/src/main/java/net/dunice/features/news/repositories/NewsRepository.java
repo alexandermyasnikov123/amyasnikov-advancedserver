@@ -1,6 +1,6 @@
 package net.dunice.features.news.repositories;
 
-import net.dunice.features.shared.entities.NewsEntity;
+import net.dunice.features.news.entities.NewsEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -12,16 +12,20 @@ import java.util.UUID;
 public interface NewsRepository extends JpaRepository<NewsEntity, Long> {
     @Query(value = """
             FROM NewsEntity ne
-            LEFT JOIN FETCH ne.author author
-            LEFT JOIN FETCH ne.tags tags
+            JOIN FETCH ne.tags tag
             WHERE (
-            LOWER(ne.title) LIKE %:keywords%
-            OR LOWER(ne.description) LIKE %:keywords%
+            LOWER(ne.title) LIKE LOWER(CONCAT('%', :keywords, '%'))
+            OR LOWER(ne.description) LIKE LOWER(CONCAT('%', :keywords, '%'))
             )
-            AND author.username = COALESCE(:author, author.username)
-            AND (:tags IS NULL OR tags.title in (:tags))
+            AND ne.authorUsername = COALESCE(:authorUsername, ne.authorUsername)
+            AND (:tags IS NULL OR tag.title in (:tags))
             """)
-    Page<NewsEntity> findAllByKeywords(String keywords, String author, List<String> tags, Pageable pageable);
+    Page<NewsEntity> findAllByKeywords(
+            String keywords,
+            String authorUsername,
+            List<String> tags,
+            Pageable pageable
+    );
 
     @Override
     @EntityGraph(value = "news_graph_join_all")
@@ -29,4 +33,6 @@ public interface NewsRepository extends JpaRepository<NewsEntity, Long> {
 
     @EntityGraph(value = "news_graph_join_all")
     Page<NewsEntity> findAllByAuthorId(UUID userId, Pageable pageable);
+
+    void deleteAllByAuthorUsername(String username);
 }

@@ -1,4 +1,4 @@
-package net.dunice.features.shared.entities;
+package net.dunice.features.news.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

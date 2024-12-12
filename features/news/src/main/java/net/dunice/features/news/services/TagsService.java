@@ -1,8 +1,9 @@
 package net.dunice.features.news.services;
 
-import net.dunice.features.shared.entities.TagEntity;
+import net.dunice.features.news.entities.TagEntity;
 import java.util.List;
+import java.util.Set;
 
 public interface TagsService {
-    List<TagEntity> storeTagsAndGet(List<String> tags);
+    Set<TagEntity> storeTagsAndGet(List<String> tags);
 }

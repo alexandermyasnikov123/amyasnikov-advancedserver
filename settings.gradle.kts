@@ -12,3 +12,5 @@ fileTree("features").matching {
     include(":features:$moduleName")
     project(":features:$moduleName").projectDir = file.parentFile
 }
+include("features:tags")
+findProject(":features:tags")?.name = "tags"

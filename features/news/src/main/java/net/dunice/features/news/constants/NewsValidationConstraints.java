@@ -10,4 +10,8 @@ public interface NewsValidationConstraints {
     int MAX_TITLE_LENGTH = 160;
 
     int MAX_PER_PAGE_NEWS = 100;
+
+    int MIN_DESCRIPTION_LENGTH = 3;
+
+    int MAX_DESCRIPTION_LENGTH = 160;
 }

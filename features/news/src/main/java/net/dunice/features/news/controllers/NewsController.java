@@ -12,9 +12,10 @@ import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.features.core.dtos.responses.common.CustomSuccessResponse;
 import net.dunice.features.news.constants.NewsValidationConstraints;
 import net.dunice.features.news.dtos.requests.NewsRequest;
+import net.dunice.features.news.entities.NewsEntity;
 import net.dunice.features.news.services.NewsService;
-import net.dunice.features.shared.entities.NewsEntity;
 import org.hibernate.validator.constraints.UUID;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,9 +39,11 @@ public class NewsController {
     public ResponseEntity<BaseSuccessResponse> createNews(
             @Valid
             @RequestBody
-            NewsRequest request
+            NewsRequest request,
+            @RequestHeader
+            HttpHeaders headers
     ) {
-        Long id = service.createNews(request);
+        Long id = service.createNews(request, headers);
         return ResponseEntity.ok(new BaseSuccessResponse().addPayload("id", id));
     }
 
@@ -51,9 +55,11 @@ public class NewsController {
             Long id,
             @Valid
             @RequestBody
-            NewsRequest request
+            NewsRequest request,
+            @RequestHeader
+            HttpHeaders headers
     ) {
-        service.updateNews(id, request);
+        service.updateNews(id, request, headers);
         return ResponseEntity.ok(new BaseSuccessResponse());
     }
 
@@ -61,9 +67,11 @@ public class NewsController {
     public ResponseEntity<BaseSuccessResponse> deleteNews(
             @PathVariable
             @NotNull(message = ValidationMessages.NEWS_ID_NULL)
-            Long id
+            Long id,
+            @RequestHeader
+            HttpHeaders headers
     ) {
-        service.deleteNews(id);
+        service.deleteNews(id, headers);
         return ResponseEntity.ok(new BaseSuccessResponse());
     }
 

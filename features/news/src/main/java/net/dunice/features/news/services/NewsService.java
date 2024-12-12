@@ -2,7 +2,8 @@ package net.dunice.features.news.services;
 
 import net.dunice.features.core.dtos.responses.ContentResponse;
 import net.dunice.features.news.dtos.requests.NewsRequest;
-import net.dunice.features.shared.entities.NewsEntity;
+import net.dunice.features.news.entities.NewsEntity;
+import org.springframework.http.HttpHeaders;
 import java.util.List;
 
 public interface NewsService {
@@ -22,9 +23,11 @@ public interface NewsService {
             String uuid
     );
 
-    Long createNews(NewsRequest request);
+    Long createNews(NewsRequest request, HttpHeaders headers);
 
-    void updateNews(Long id, NewsRequest request);
+    void updateNews(Long id, NewsRequest request, HttpHeaders headers);
 
-    void deleteNews(Long id);
+    void deleteNews(Long id, HttpHeaders headers);
+
+    void deleteAllUserNews(String username);
 }

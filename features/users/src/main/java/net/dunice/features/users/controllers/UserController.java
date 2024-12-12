@@ -9,6 +9,7 @@ import net.dunice.features.core.dtos.responses.common.CustomSuccessResponse;
 import net.dunice.features.users.dtos.requests.UserRequest;
 import net.dunice.features.users.dtos.responses.UserResponse;
 import net.dunice.features.users.services.UserService;
+import net.dunice.features.users.validation.ValidEmail;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,16 @@ public class UserController {
             String uuid
     ) {
         UserResponse userResponse = service.loadUserByUuid(java.util.UUID.fromString(uuid));
+        return ResponseEntity.ok(new CustomSuccessResponse<>(userResponse));
+    }
+
+    @GetMapping(value = "email/{email}")
+    public ResponseEntity<BaseSuccessResponse> loadUserByEmail(
+            @PathVariable
+            @ValidEmail
+            String email
+    ) {
+        UserResponse userResponse = service.loadUserByEmail(email);
         return ResponseEntity.ok(new CustomSuccessResponse<>(userResponse));
     }
 
