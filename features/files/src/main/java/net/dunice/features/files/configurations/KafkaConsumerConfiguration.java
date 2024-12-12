@@ -1,4 +1,4 @@
-package net.dunice.features.users.configurations;
+package net.dunice.features.files.configurations;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerConfig;
