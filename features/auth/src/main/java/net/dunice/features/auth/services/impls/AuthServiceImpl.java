@@ -6,6 +6,7 @@ import net.dunice.features.auth.dtos.requests.LoginRequest;
 import net.dunice.features.auth.dtos.requests.RegisterRequest;
 import net.dunice.features.auth.dtos.responses.UserResponse;
 import net.dunice.features.auth.entities.UserEntityDetails;
+import net.dunice.features.auth.kafka.UserEventProducer;
 import net.dunice.features.auth.security.JwtService;
 import net.dunice.features.auth.services.AuthService;
 import net.dunice.features.auth.services.UserEntityDetailsService;
@@ -33,6 +34,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserApiClient userApiClient;
 
     private final UserEntityDetailsService userDetailsService;
+
+    private final UserEventProducer userEventProducer;
 
     @Override
     @Transactional
@@ -85,5 +88,16 @@ public class AuthServiceImpl implements AuthService {
         }
 
         throw new ErrorCodesException(ErrorCodes.UNAUTHORISED);
+    }
+
+    @Override
+    @Transactional
+    public void deleteCurrentAuth() {
+        UserDetails current = loadCurrentAuth();
+        final String username = current.getUsername();
+
+        if (userDetailsService.deleteUserByUsername(username)) {
+            userEventProducer.produceUserDeleted(username);
+        }
     }
 }

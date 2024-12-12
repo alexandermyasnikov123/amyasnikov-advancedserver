@@ -13,5 +13,5 @@ public interface UserEntityDetailsService extends UserDetailsService {
 
     UserEntityDetails createDetails(UUID id, String username, String passwordHash);
 
-    void deleteUserByUsername(String username);
+    Boolean deleteUserByUsername(String username);
 }

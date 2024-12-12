@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface UserDetailsRepository extends JpaRepository<UserEntityDetails, UUID> {
     Optional<UserEntityDetails> findByUsername(String username);
 
-    void deleteByUsername(String username);
+    Integer deleteByUsername(String username);
 }

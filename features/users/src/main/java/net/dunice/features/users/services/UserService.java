@@ -18,4 +18,6 @@ public interface UserService {
     UserResponse insertUser(UserRequest request);
 
     void deleteUser(HttpHeaders headers);
+
+    void deleteUserByUsername(String username);
 }

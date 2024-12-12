@@ -44,8 +44,8 @@ public class UserDetailsServiceImpl implements UserEntityDetailsService {
     }
 
     @Override
-    public void deleteUserByUsername(String username) {
+    public Boolean deleteUserByUsername(String username) {
         UserDetails details = loadUserByUsername(username);
-        repository.deleteByUsername(details.getUsername());
+        return repository.deleteByUsername(details.getUsername()) > 0;
     }
 }

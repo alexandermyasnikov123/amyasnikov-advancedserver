@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,5 +39,11 @@ public class FileController {
             HttpServletRequest request
     ) throws Exception {
         return ResponseEntity.ok(service.storeFile(file, request));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<BaseSuccessResponse> deleteFile(@RequestParam String url) {
+        service.deleteFileByUrl(url);
+        return ResponseEntity.ok(new BaseSuccessResponse());
     }
 }

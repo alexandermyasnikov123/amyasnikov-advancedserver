@@ -15,6 +15,7 @@ dependencies {
 
     runtimeOnly(libs.h2.db)
     implementation(libs.spring.eureka.client)
+    implementation(libs.spring.kafka)
 
     implementation(libs.bundles.feign.commons)
 

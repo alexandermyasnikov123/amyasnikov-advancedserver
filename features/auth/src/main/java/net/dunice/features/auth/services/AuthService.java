@@ -11,4 +11,6 @@ public interface AuthService {
     UserResponse loginUser(LoginRequest request);
 
     UserDetails loadCurrentAuth();
+
+    void deleteCurrentAuth();
 }

@@ -10,6 +10,7 @@ import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.features.core.dtos.responses.common.CustomSuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,5 +39,11 @@ public class AuthController {
     public ResponseEntity<BaseSuccessResponse> loadCurrentAuth() {
         UserDetails response = service.loadCurrentAuth();
         return ResponseEntity.ok(new CustomSuccessResponse<>(response));
+    }
+
+    @DeleteMapping(value = "current")
+    public ResponseEntity<BaseSuccessResponse> deleteCurrentAuth() {
+        service.deleteCurrentAuth();
+        return ResponseEntity.ok(new BaseSuccessResponse());
     }
 }

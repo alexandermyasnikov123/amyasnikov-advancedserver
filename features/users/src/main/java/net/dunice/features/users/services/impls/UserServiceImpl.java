@@ -14,6 +14,7 @@ import net.dunice.features.users.repositories.UsersRepository;
 import net.dunice.features.users.services.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,8 +77,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(HttpHeaders headers) {
         UserResponse current = loadCurrent(headers);
         repository.deleteById(current.id());
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserByUsername(String username) {
+        if (repository.deleteByUsername(username) < 1) {
+            throw new ErrorCodesException(ErrorCodes.USER_NOT_FOUND);
+        }
     }
 }
