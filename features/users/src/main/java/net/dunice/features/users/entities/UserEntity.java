@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
+import net.dunice.features.users.entities.callbacks.DeleteImageCallback;
 import java.util.UUID;
 
 @Entity
@@ -20,6 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIncludeProperties(value = {"userId", "username"})
+@EntityListeners(value = DeleteImageCallback.class)
 public class UserEntity {
     @Id
     @Column(name = "uuid")

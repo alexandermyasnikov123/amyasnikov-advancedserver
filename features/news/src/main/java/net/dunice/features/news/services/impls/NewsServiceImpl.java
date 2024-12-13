@@ -82,7 +82,6 @@ public class NewsServiceImpl implements NewsService {
     @Transactional
     public void deleteAllUserNews(String username) {
         repository.deleteAllByAuthorUsername(username);
-        //TODO: Delete all images here
     }
 
     @Override

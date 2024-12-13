@@ -35,4 +35,6 @@ public interface NewsRepository extends JpaRepository<NewsEntity, Long> {
     Page<NewsEntity> findAllByAuthorId(UUID userId, Pageable pageable);
 
     void deleteAllByAuthorUsername(String username);
+
+    List<NewsEntity> findAllByAuthorUsername(String username);
 }

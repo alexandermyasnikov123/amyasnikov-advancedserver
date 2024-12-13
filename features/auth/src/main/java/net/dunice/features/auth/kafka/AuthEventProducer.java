@@ -11,17 +11,10 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UserEventProducer {
+public class AuthEventProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public CompletableFuture<SendResult<String, String>> produceUserDeleted(String username) {
-        return kafkaTemplate.send(KafkaConstants.DELETION_TOPIC, username)
-                .whenComplete((sendResult, throwable) -> {
-                    if (throwable == null) {
-                        log.info("Message successfully sent: {}", sendResult);
-                    } else {
-                        log.error("Exception occurred: {}, kafka send result: {}", throwable.getMessage(), sendResult);
-                    }
-                });
+        return kafkaTemplate.send(KafkaConstants.DELETION_TOPIC, username);
     }
 }

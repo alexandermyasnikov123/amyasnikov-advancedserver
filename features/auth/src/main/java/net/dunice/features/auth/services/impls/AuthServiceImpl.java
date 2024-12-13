@@ -6,7 +6,7 @@ import net.dunice.features.auth.dtos.requests.LoginRequest;
 import net.dunice.features.auth.dtos.requests.RegisterRequest;
 import net.dunice.features.auth.dtos.responses.UserResponse;
 import net.dunice.features.auth.entities.UserEntityDetails;
-import net.dunice.features.auth.kafka.UserEventProducer;
+import net.dunice.features.auth.kafka.AuthEventProducer;
 import net.dunice.features.auth.security.JwtService;
 import net.dunice.features.auth.services.AuthService;
 import net.dunice.features.auth.services.UserEntityDetailsService;
@@ -35,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserEntityDetailsService userDetailsService;
 
-    private final UserEventProducer userEventProducer;
+    private final AuthEventProducer authEventProducer;
 
     @Override
     @Transactional
@@ -97,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
         final String username = current.getUsername();
 
         if (userDetailsService.deleteUserByUsername(username)) {
-            userEventProducer.produceUserDeleted(username);
+            authEventProducer.produceUserDeleted(username);
         }
     }
 }

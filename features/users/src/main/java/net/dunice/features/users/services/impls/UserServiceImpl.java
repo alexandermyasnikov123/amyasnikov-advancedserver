@@ -9,7 +9,6 @@ import net.dunice.features.users.dtos.requests.UserRequest;
 import net.dunice.features.users.dtos.responses.CredentialsResponse;
 import net.dunice.features.users.dtos.responses.UserResponse;
 import net.dunice.features.users.entities.UserEntity;
-import net.dunice.features.users.kafka.UserImageProducer;
 import net.dunice.features.users.mappers.UserMapper;
 import net.dunice.features.users.repositories.UsersRepository;
 import net.dunice.features.users.services.UserService;
@@ -28,8 +27,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapper mapper;
 
     private final AuthApiClient authApiClient;
-
-    private final UserImageProducer imageProducer;
 
     @Override
     public List<UserResponse> loadAllUsers() {
@@ -69,15 +66,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUser(HttpHeaders headers, UserRequest request) {
         UserResponse original = loadCurrent(headers);
-        final String oldAvatar = original.avatar();
         UserEntity entity = mapper.mapToEntity(original.id(), request);
 
         repository.save(entity);
-
-        if (!oldAvatar.equals(entity.getAvatar())) {
-            imageProducer.produceImageDeletion(oldAvatar);
-        }
-
         return mapper.mapToResponse(entity);
     }
 
@@ -101,7 +92,6 @@ public class UserServiceImpl implements UserService {
         UserResponse current = loadCurrent(headers);
 
         repository.deleteById(current.id());
-        imageProducer.produceImageDeletion(current.avatar());
     }
 
     @Override
@@ -112,6 +102,5 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ErrorCodesException(ErrorCodes.USER_NOT_FOUND));
 
         repository.delete(entity);
-        imageProducer.produceImageDeletion(entity.getAvatar());
     }
 }
