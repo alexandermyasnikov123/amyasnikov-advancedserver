@@ -1,21 +1,62 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
     java
     application
-    id("org.springframework.boot") version "3.3.5"
-    id("io.spring.dependency-management") version "1.1.6"
+    `kotlin-dsl`
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
 }
 
 group = "net.dunice"
 version = "0.0.1-SNAPSHOT"
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+application {
+    mainClass = AppConstants.MAIN_CLASS
+}
+
+subprojects {
+    plugins.withType<SpringBootPlugin> {
+        tasks.bootJar {
+            enabled = false
+        }
     }
 }
 
-application {
-    mainClass = "net.dunice.newsapi.NewsApiApplication"
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+
+    plugins.withType<JavaPlugin> {
+        java {
+            toolchain {
+                languageVersion = AppConstants.javaVersion
+            }
+        }
+        dependencies {
+            compileOnly(libs.lombok)
+            annotationProcessor(libs.lombok)
+
+            testCompileOnly(libs.lombok)
+            testAnnotationProcessor(libs.lombok)
+        }
+    }
+
+    plugins.withType<SpringBootPlugin> {
+        dependencies {
+            implementation(libs.spring.log4j)
+            modules {
+                module(libs.spring.logback.get().module) {
+                    replacedBy(libs.spring.log4j.get().module)
+                }
+            }
+            configurations.all {
+                exclude(group = AppConstants.EXCLUDE_LOGBACK_GROUP, module = AppConstants.EXCLUDE_LOGBACK_MODULE)
+            }
+        }
+    }
 }
 
 configurations {
@@ -24,39 +65,24 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    compileOnly("org.projectlombok:lombok")
-    testCompileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
+    developmentOnly(libs.spring.dev.tools)
 
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation(libs.spring.jpa)
+    implementation(libs.spring.web)
+    implementation(libs.spring.validation)
+    runtimeOnly(libs.bundles.database.commons)
 
-    implementation("com.h2database:h2")
-    runtimeOnly("org.postgresql:postgresql")
+    implementation(libs.spring.eureka.server)
+    implementation(libs.spring.actuator)
 
-    implementation("org.liquibase:liquibase-core")
-    implementation("net.coobird:thumbnailator:0.4.20")
+    implementation(libs.liquibase)
 
-    implementation(libs.map.struct)
-    annotationProcessor(libs.map.struct.apt)
+    testImplementation(libs.spring.starter.test)
+    testImplementation(libs.spring.security.test)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
-    implementation(libs.jwt.api)
-    runtimeOnly(libs.jwt.impl)
-    runtimeOnly(libs.jwt.jackson)
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.security:spring-security-test")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
+    implementation(project(":features:core"))
 }
 
 tasks.withType<Test> {

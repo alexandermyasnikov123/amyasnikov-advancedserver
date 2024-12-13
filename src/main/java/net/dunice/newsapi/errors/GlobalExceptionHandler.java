@@ -2,13 +2,13 @@ package net.dunice.newsapi.errors;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import net.dunice.newsapi.constants.ErrorCodes;
-import net.dunice.newsapi.constants.ValidationMessages;
-import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
+import net.dunice.features.core.dtos.constants.ErrorCodes;
+import net.dunice.features.core.dtos.constants.ValidationMessages;
+import net.dunice.features.core.dtos.exceptions.ErrorCodesException;
+import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -27,10 +27,10 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(Stream.of(exception.getStatusText()));
     }
 
-    @ExceptionHandler(value = BadCredentialsException.class)
+    /*@ExceptionHandler(value = BadCredentialsException.class)
     public ResponseEntity<BaseSuccessResponse> handleAuthenticationException() {
         return buildErrorResponse(Stream.of(ValidationMessages.PASSWORD_NOT_VALID));
-    }
+    }*/
 
     @ExceptionHandler(value = FileNotFoundException.class)
     public ResponseEntity<BaseSuccessResponse> handleFileNotFoundExceptions() {
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = ErrorCodesException.class)
     public ResponseEntity<BaseSuccessResponse> handleErrorCodesExceptions(ErrorCodesException exception) {
-        return buildErrorResponse(Stream.of(exception.getErrorCodes().getMessage()));
+        return buildErrorResponse(exception.getErrorCodes().stream().map(ErrorCodes::getMessage));
     }
 
     @ExceptionHandler(value = ConstraintViolationException.class)

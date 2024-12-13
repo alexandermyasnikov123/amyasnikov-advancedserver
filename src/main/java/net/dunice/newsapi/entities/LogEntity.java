@@ -43,8 +43,4 @@ public class LogEntity {
     @Column
     @CreationTimestamp
     private Date date;
-
-    @ManyToOne
-    @JoinColumn(name = "user_uuid")
-    private UserEntity user;
 }

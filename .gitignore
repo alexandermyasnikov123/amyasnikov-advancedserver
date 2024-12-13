@@ -6,7 +6,9 @@ build/
 !**/src/test/**/build/
 **/hidden.properties
 **/slf4j*.properties
-**/.env
+.env
+**/test*/**
+**/*[tT]est*.java
 
 ### STS ###
 .apt_generated

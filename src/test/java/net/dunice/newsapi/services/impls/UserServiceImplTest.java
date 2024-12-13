@@ -1,12 +1,12 @@
 package net.dunice.newsapi.services.impls;
 
 import net.dunice.newsapi.BaseTestCase;
-import net.dunice.newsapi.constants.ErrorCodes;
-import net.dunice.newsapi.dtos.requests.UpdateUserRequest;
+import net.dunice.features.news.constants.ErrorCodes;
+import net.dunice.features.news.requests.UpdateUserRequest;
 import net.dunice.newsapi.dtos.responses.PublicUserResponse;
 import net.dunice.newsapi.entities.UserEntity;
 import net.dunice.newsapi.errors.ErrorCodesException;
-import net.dunice.newsapi.mappers.UserEntityMapper;
+import net.dunice.features.news.mappers.UserEntityMapper;
 import net.dunice.newsapi.repositories.UsersRepository;
 import net.dunice.newsapi.services.defaults.UserTestConstants;
 import net.dunice.newsapi.services.defaults.UserTestDefaults;

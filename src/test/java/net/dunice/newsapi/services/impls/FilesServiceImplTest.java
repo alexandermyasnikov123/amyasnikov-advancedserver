@@ -2,7 +2,7 @@ package net.dunice.newsapi.services.impls;
 
 import jakarta.servlet.http.HttpServletRequest;
 import net.dunice.newsapi.BaseTestCase;
-import net.dunice.newsapi.constants.ErrorCodes;
+import net.dunice.features.news.constants.ErrorCodes;
 import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.errors.ErrorCodesException;
 import net.dunice.newsapi.services.defaults.FilesTestConstants;

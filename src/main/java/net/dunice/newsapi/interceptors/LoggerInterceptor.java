@@ -6,12 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.dunice.newsapi.constants.ErrorCodes;
-import net.dunice.newsapi.dtos.responses.common.BaseSuccessResponse;
+import net.dunice.features.core.dtos.constants.ErrorCodes;
+import net.dunice.features.core.dtos.responses.common.BaseSuccessResponse;
 import net.dunice.newsapi.entities.LogEntity;
+import net.dunice.newsapi.impl.HttpServletResponseUtils;
 import net.dunice.newsapi.repositories.LogsRepository;
-import net.dunice.newsapi.utils.AuthenticationUtils;
-import net.dunice.newsapi.utils.HttpServletResponseUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -36,8 +35,7 @@ public class LoggerInterceptor implements HandlerInterceptor {
                 .requestMethod(request.getMethod())
                 .responseCode(response.getStatus())
                 .endpoint(request.getRequestURL().toString())
-                .requireAuth(request.getHeader(HttpHeaders.AUTHORIZATION) != null)
-                .user(AuthenticationUtils.getCurrentUser());
+                .requireAuth(request.getHeader(HttpHeaders.AUTHORIZATION) != null);
 
         HttpServletResponseUtils.findCachedResponseBody(response).ifPresent(body -> {
             ErrorCodes errorCodes = findErrorCodesFromResponseBody(body);

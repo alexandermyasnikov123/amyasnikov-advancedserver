@@ -1,7 +1,7 @@
 package net.dunice.newsapi.services.impls;
 
 import net.dunice.newsapi.BaseTestCase;
-import net.dunice.newsapi.mappers.UserEntityMapper;
+import net.dunice.features.news.mappers.UserEntityMapper;
 import net.dunice.newsapi.security.JwtService;
 import net.dunice.newsapi.services.UserService;
 import net.dunice.newsapi.services.defaults.UserTestConstants;
