@@ -5,7 +5,7 @@ public interface KafkaConstants {
 
     String IMAGE_DELETION_TOPIC = "image-deletion-topic";
 
-    String DELETION_GROUP = "deletion-group";
+    String DELETION_GROUP = "deletion-group_6";
 
     int PARTITIONS = 8;
 
